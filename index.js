@@ -7,21 +7,15 @@ import CONNECT from './src/connect'
 import TOGGLES from './src/toggles'
 import TRACKER from './src/tracker'
 
+let API = window.SubwayBuilderAPI
+
 const Conduct = () => {
   // connect to the API
-  let API = window.SubwayBuilderAPI
   let Conductor = window.Conductor = CONNECT(API, configs)
   if (!Conductor) return console.log(`>> Conductor Failed :: No API Access.`)
 
   // embed our menu
   Conductor.MENU = TOGGLES(API)
-
-  // define our loop
-  const Loop = () => { TRACKER(API) }
-  // clear/apply our loop
-  if (Conductor.Loop) clearInterval(Conductor.Loop)
-  Conductor.Loop = setInterval(Loop, 2500)
-  Loop() // fire loop to start the engine
 
   // and that's it! we're done!
   console.log(`>> Conductor Successfully Activated!`)
@@ -29,4 +23,14 @@ const Conduct = () => {
 
 // initialize the mod
 Conduct()
-// window.SubwayBuilderAPI.hooks.onGameInit(Conduct)
+
+// start the loop on gameInit
+API.hooks.onGameInit(() => {
+  // clear the loop if it exists
+  if (window.Conductor.Loop) clearInterval(window.Conductor.Loop)
+  // then define the loop
+  window.Conductor.Loop = setInterval(() => { 
+    TRACKER(API) 
+  }, 2500)
+
+})

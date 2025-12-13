@@ -7,10 +7,11 @@ export default {
     // blueprint cost buffer for trains
     TRAIN_BUFFER: 100000000, // default 100000000
 
-    // colors for tracker
-    COLOR_POOR: '#a3a3a3',
-    COLOR_WARN: '#6cbe45',
-    COLOR_RICH: '#fccc0a'
+    COLORS: { // colors for tracker
+      POOR: '#a3a3a3',
+      RICH: '#6cbe45',
+      WARN: '#fccc0a',
+    }
   },
 
 
