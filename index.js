@@ -4,7 +4,7 @@
 import configs from './config'
 
 import CONNECT from './src/connect'
-import TOGGLES from './src/toggles'
+// import TOGGLES from './src/toggles'
 import TRACKER from './src/tracker'
 
 let API = window.SubwayBuilderAPI
@@ -15,7 +15,7 @@ const Conduct = () => {
   if (!Conductor) return console.log(`>> Conductor Failed :: No API Access.`)
 
   // embed our menu
-  Conductor.MENU = TOGGLES(API)
+  // Conductor.MENU = TOGGLES(API)
 
   // and that's it! we're done!
   console.log(`>> Conductor Successfully Activated!`)
