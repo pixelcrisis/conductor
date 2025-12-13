@@ -6,6 +6,12 @@ Subway Builder Mod - Minor Settings Tweaks & Gameplay
   
 Open your mod folder and delete (if any) your old version of Subway Conductor.  
 Download `conductor.zip` and extract it to your mods folder.  
+
+## What This Mod Does
+- **Blueprint Tracking:** Tracks Game Funds vs Blueprint Costs  
+  Cash Icon will be gray when you can't afford your blueprints, yellow when you can afford them, and green when you can afford your blueprints + 100m for additional trains.  
+  
+- Tweaks Game Settings ****(Requires Rebuilding The Mod!)***
   
 ## Development / Testing / Changing Configs
 *Required: Install Node.js, and run `npm install --global yarn`*  
