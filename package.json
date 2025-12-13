@@ -9,6 +9,6 @@
     "esbuild": "^0.27.1"
   },
   "scripts": {
-    "build": "esbuild index.js --bundle --minify --outdir=dist"
+    "build": "esbuild index.js --bundle --minify --outdir=conductor"
   }
 }
