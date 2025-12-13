@@ -10,11 +10,11 @@ export default (API, CONF) => {
   console.log(`>> Conductor Connected: v${ API.version }...`)
 
   // load/update data
-  let data = DB.Load()
-  if (data) {
-    DB.Meld(CONF, data)
-    DB.Save(CONF)
-  }
+  // let data = DB.Load()
+  // if (data) {
+  //   DB.Meld(CONF, data)
+  //   DB.Save(CONF)
+  // }
 
   // overwrite game settings
   console.log(`>> Conductor: Overwriting Rules...`)
