@@ -19,7 +19,7 @@ Download `conductor.zip` and extract it to your mods folder.
 Open your mods folder, and open `conductor/index.js` in your favorite text editor.  
 Change the config values at the top, save the file, restart the game. Profit!
   
-## Development / Testing / Changing Configs
+## Development / Testing
 *Required: Install Node.js, and run `npm install --global yarn`*  
   
 - Open a terminal in your working directory.
