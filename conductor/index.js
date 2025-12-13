@@ -1,1 +1,93 @@
-(()=>{var e={MAIN:{TRAIN_BUFFER:1e8,COLORS:{POOR:"#a3a3a3",RICH:"#6cbe45",WARN:"#fccc0a"}},GAME:{STARTING_MONEY:3e9,STARTING_TRAIN_CARS:30,DEFAULT_TICKET_COST:3,MIN_TRACK_LENGTH:10,MIN_TURN_RADIUS:29,MAX_SLOPE_PERCENTAGE:4,STUCK_TRAIN_TIMEOUT:900,CONSTRUCTION_COSTS:{ELEVATION_THRESHOLDS:{DEEP_BORE:-100,STANDARD_TUNNEL:-24,CUT_AND_COVER:-10,AT_GRADE:-3,ELEVATED:4.5}}},TEST:{CHECK:5,TEST:3,DEEP:{CHECK:6,TEST:4}}};var i=(o,r)=>(console.log(">> Conductor Booting..."),!o||!o.version?!1:(console.log(`>> Conductor Connected: v${o.version}...`),console.log(">> Conductor: Overwriting Rules..."),o.modifyConstants(r.GAME),{CONF:r}));var{COLORS:n,TRAIN_BUFFER:f}=e.MAIN,E="main > .absolute.bottom-0 .lucide-banknote",d=o=>{let a=o.gameState.getTracks().filter(T=>T.displayType=="blueprint"),t=window.Conductor.__blueprints||!1,u=o.gameState.getBudget(),C=o.gameState.calculateBlueprintCost(a).totalCost,s=u-C;s<0?t=n.POOR:s<f?t=n.WARN:t!=n.RICH&&(t=window.Conductor.__blueprints=n.RICH);let l=document.querySelectorAll(E);l&&l[0]&&(l[0].style.color=t)};var c=window.SubwayBuilderAPI,R=()=>{if(!(window.Conductor=i(c,e)))return console.log(">> Conductor Failed :: No API Access.");console.log(">> Conductor Successfully Activated!")};R();c.hooks.onGameInit(()=>{window.Conductor.Loop&&clearInterval(window.Conductor.Loop),window.Conductor.Loop=setInterval(()=>{d(c)},2500)});})();
+(() => {
+  // config.js
+  var config_default = {
+    // SUBWAY CONDUCTOR CONFIGS
+    MAIN: {
+      // Blueprint Tracker 
+      // Default: 100000000
+      TRAIN_BUFFER: 1e8,
+      // Tracker Indicators
+      COLORS: {
+        POOR: "#a3a3a3",
+        RICH: "#6cbe45",
+        WARN: "#fccc0a"
+      }
+    },
+    // CORE GAME SETTINGS TWEAKS
+    GAME: {
+      // default 3000000000
+      STARTING_MONEY: 3e9,
+      // default 30
+      STARTING_TRAIN_CARS: 30,
+      // default 3
+      DEFAULT_TICKET_COST: 3,
+      // default 10
+      MIN_TRACK_LENGTH: 10,
+      // default 29
+      MIN_TURN_RADIUS: 29,
+      // default 4
+      MAX_SLOPE_PERCENTAGE: 4,
+      // default 900
+      STUCK_TRAIN_TIMEOUT: 900,
+      // GAME COST OVERRIDES
+      CONSTRUCTION_COSTS: {
+        ELEVATION_THRESHOLDS: {
+          // default -100
+          DEEP_BORE: -100,
+          // default -24
+          STANDARD_TUNNEL: -24,
+          // default -10
+          CUT_AND_COVER: -10,
+          // default -3
+          AT_GRADE: -3,
+          // default 4.5
+          ELEVATED: 4.5
+        }
+      }
+    }
+  };
+
+  // src/connect.js
+  var connect_default = (API2, CONF) => {
+    console.log(`>> Conductor Booting...`);
+    if (!API2 || !API2.version) return false;
+    console.log(`>> Conductor Connected: v${API2.version}...`);
+    console.log(`>> Conductor: Overwriting Rules...`);
+    API2.modifyConstants(CONF.GAME);
+    return { CONF };
+  };
+
+  // src/tracker.js
+  var { COLORS, TRAIN_BUFFER } = config_default.MAIN;
+  var icon = `main > .absolute.bottom-0 .lucide-banknote`;
+  var tracker_default = (API2) => {
+    const list = API2.gameState.getTracks();
+    const plan = list.filter((t) => t.displayType == "blueprint");
+    let state = window.Conductor.__blueprints || false;
+    const fund = API2.gameState.getBudget();
+    const cost = API2.gameState.calculateBlueprintCost(plan).totalCost;
+    const diff = fund - cost;
+    if (diff < 0) state = COLORS.POOR;
+    else if (diff < TRAIN_BUFFER) state = COLORS.WARN;
+    else if (state != COLORS.RICH) {
+      state = window.Conductor.__blueprints = COLORS.RICH;
+    }
+    let el = document.querySelectorAll(icon);
+    if (el && el[0]) el[0].style.color = state;
+  };
+
+  // index.js
+  var API = window.SubwayBuilderAPI;
+  var Conduct = () => {
+    let Conductor = window.Conductor = connect_default(API, config_default);
+    if (!Conductor) return console.log(`>> Conductor Failed :: No API Access.`);
+    console.log(`>> Conductor Successfully Activated!`);
+  };
+  Conduct();
+  API.hooks.onGameInit(() => {
+    if (window.Conductor.Loop) clearInterval(window.Conductor.Loop);
+    window.Conductor.Loop = setInterval(() => {
+      tracker_default(API);
+    }, 2500);
+  });
+})();

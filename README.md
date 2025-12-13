@@ -14,6 +14,10 @@ Download `conductor.zip` and extract it to your mods folder.
   Cash Icon will be gray when you can't afford your blueprints, yellow when you can afford them, and green when you can afford your blueprints + 100m for additional trains.  
   
 - Tweaks Game Settings ****(Requires Rebuilding The Mod!)***
+
+## Changing Configs
+Open your mods folder, and open `conductor/index.js` in your favorite text editor.  
+Change the config values at the top, save the file, restart the game. Profit!
   
 ## Development / Testing / Changing Configs
 *Required: Install Node.js, and run `npm install --global yarn`*  
