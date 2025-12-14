@@ -6,6 +6,7 @@ import configs from './config'
 import CONNECT from './src/connect'
 // import TOGGLES from './src/toggles'
 import TRACKER from './src/tracker'
+import AUTOPAN from './src/autopan'
 
 let API = window.SubwayBuilderAPI
 
@@ -24,13 +25,16 @@ const Conduct = () => {
 // initialize the mod
 Conduct()
 
-// start the loop on gameInit
 API.hooks.onGameInit(() => {
+  // start the loop on gameInit
   // clear the loop if it exists
   if (window.Conductor.Loop) clearInterval(window.Conductor.Loop)
   // then define the loop
   window.Conductor.Loop = setInterval(() => { 
     TRACKER(API) 
   }, 2500)
+})
 
+API.hooks.onMapReady((map) => {
+  AUTOPAN(map)
 })

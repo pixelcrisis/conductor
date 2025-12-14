@@ -6,6 +6,13 @@
       // Blueprint Tracker 
       // Default: 100000000
       TRAIN_BUFFER: 1e8,
+      // Auto Pan Area
+      // Trigger Area Size
+      // Default: 50 (Pixels)
+      PAN_AREA: 50,
+      // The Pan Speed (pixels moved)
+      // Default: 50, Disable: 0
+      PAN_SPEED: 50,
       // Tracker Indicators
       COLORS: {
         POOR: "#a3a3a3",
@@ -76,6 +83,36 @@
     if (el && el[0]) el[0].style.color = state;
   };
 
+  // src/autopan.js
+  var { PAN_AREA, PAN_SPEED } = config_default.MAIN;
+  var autopan_default = (MAP) => {
+    const Pan = (dx, dy) => {
+      window.AUTOPAN = setTimeout(() => {
+        window.AUTOPAN = null;
+        window.PANNING = setInterval(() => {
+          MAP.panBy([dx * PAN_SPEED, dy * PAN_SPEED]);
+        }, 50);
+      }, 200);
+    };
+    if (PAN_SPEED) {
+      MAP.on("mousemove", (e) => {
+        const s = MAP.getCanvas().getBoundingClientRect();
+        const x = e.point.x - s.left;
+        const y = e.point.y - s.top;
+        if (window.AUTOPAN) clearTimeout(window.AUTOPAN);
+        if (window.PANNING) clearInterval(window.PANNING);
+        if (y < PAN_AREA) Pan(0, -1);
+        else if (y > s.height - PAN_AREA - 104) Pan(0, 1);
+        else if (x < PAN_AREA) Pan(-1, 0);
+        else if (x > s.width - PAN_AREA) Pan(1, 0);
+      });
+      MAP.on("mouseout", (e) => {
+        if (window.AUTOPAN) clearTimeout(window.AUTOPAN);
+        if (window.PANNING) clearInterval(window.PANNING);
+      });
+    }
+  };
+
   // index.js
   var API = window.SubwayBuilderAPI;
   var Conduct = () => {
@@ -89,5 +126,8 @@
     window.Conductor.Loop = setInterval(() => {
       tracker_default(API);
     }, 2500);
+  });
+  API.hooks.onMapReady((map) => {
+    autopan_default(map);
   });
 })();

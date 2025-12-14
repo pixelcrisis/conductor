@@ -1,7 +1,7 @@
 // Conductor Connect
 // API / Storage Connection
 
-import DB from './storage'
+// import DB from './storage'
 
 export default (API, CONF) => {
   // connect to the API
