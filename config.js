@@ -9,19 +9,24 @@ export default {
     // Default: 100000000
     TRAIN_BUFFER: 100000000,
 
-    // Auto Pan Area
-    // Trigger Area Size
-    // Default: 50 (Pixels)
-    PAN_AREA: 50,
-    // The Pan Speed (pixels moved)
-    // Default: 50, Disable: 0
-    PAN_SPEED: 50,
-
     // Tracker Indicators
     COLORS: {
       POOR: '#a3a3a3',
       RICH: '#6cbe45',
       WARN: '#fccc0a',
+    },
+
+    AUTO_PAN: {
+      // Auto Pan Area
+      // Trigger Area Size
+      // Default: 50 (Pixels)
+      AREA: 50,
+      // How many pixels to move
+      // Default: 100, Disable: 0
+      DISTANCE: 100,
+      // How often (ms) to move
+      // Default: 500, Disable: 0
+      SPEED: 500
     }
   },
 

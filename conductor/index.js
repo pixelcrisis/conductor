@@ -6,18 +6,23 @@
       // Blueprint Tracker 
       // Default: 100000000
       TRAIN_BUFFER: 1e8,
-      // Auto Pan Area
-      // Trigger Area Size
-      // Default: 50 (Pixels)
-      PAN_AREA: 50,
-      // The Pan Speed (pixels moved)
-      // Default: 50, Disable: 0
-      PAN_SPEED: 50,
       // Tracker Indicators
       COLORS: {
         POOR: "#a3a3a3",
         RICH: "#6cbe45",
         WARN: "#fccc0a"
+      },
+      AUTO_PAN: {
+        // Auto Pan Area
+        // Trigger Area Size
+        // Default: 50 (Pixels)
+        AREA: 50,
+        // How many pixels to move
+        // Default: 100, Disable: 0
+        DISTANCE: 100,
+        // How often (ms) to move
+        // Default: 500, Disable: 0
+        SPEED: 500
       }
     },
     // CORE GAME SETTINGS TWEAKS
@@ -84,33 +89,27 @@
   };
 
   // src/autopan.js
-  var { PAN_AREA, PAN_SPEED } = config_default.MAIN;
+  var { AREA, SPEED, DISTANCE } = config_default.MAIN.AUTO_PAN;
   var autopan_default = (MAP) => {
     const Pan = (dx, dy) => {
-      window.AUTOPAN = setTimeout(() => {
-        window.AUTOPAN = null;
-        window.PANNING = setInterval(() => {
-          MAP.panBy([dx * PAN_SPEED, dy * PAN_SPEED]);
-        }, 50);
-      }, 200);
+      window.PANNING = setInterval(() => {
+        MAP.panBy([dx * DISTANCE, dy * DISTANCE]);
+      }, SPEED);
     };
-    if (PAN_SPEED) {
-      MAP.on("mousemove", (e) => {
-        const s = MAP.getCanvas().getBoundingClientRect();
-        const x = e.point.x - s.left;
-        const y = e.point.y - s.top;
-        if (window.AUTOPAN) clearTimeout(window.AUTOPAN);
-        if (window.PANNING) clearInterval(window.PANNING);
-        if (y < PAN_AREA) Pan(0, -1);
-        else if (y > s.height - PAN_AREA - 104) Pan(0, 1);
-        else if (x < PAN_AREA) Pan(-1, 0);
-        else if (x > s.width - PAN_AREA) Pan(1, 0);
-      });
-      MAP.on("mouseout", (e) => {
-        if (window.AUTOPAN) clearTimeout(window.AUTOPAN);
-        if (window.PANNING) clearInterval(window.PANNING);
-      });
-    }
+    if (!AREA || !DISTANCE || !SPEED) return;
+    MAP.on("mousemove", (e) => {
+      const s = MAP.getCanvas().getBoundingClientRect();
+      const x = e.point.x - s.left;
+      const y = e.point.y - s.top;
+      if (window.PANNING) clearInterval(window.PANNING);
+      if (y < AREA) Pan(0, -1);
+      else if (y > s.height - AREA - 104) Pan(0, 1);
+      else if (x < AREA) Pan(-1, 0);
+      else if (x > s.width - AREA) Pan(1, 0);
+    });
+    MAP.on("mouseout", (e) => {
+      if (window.PANNING) clearInterval(window.PANNING);
+    });
   };
 
   // index.js
