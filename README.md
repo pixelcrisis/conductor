@@ -6,6 +6,7 @@ Subway Builder Mod - Minor Settings Tweaks & Gameplay
   
 Open your mod folder and delete (if any) your old version of Subway Conductor.  
 Download `conductor.zip` and extract it to your mods folder.  
+[Direct Download Link](https://github.com/pixelcrisis/conductor/raw/refs/heads/main/conductor.zip)
 
 #### Currently only compatible with beta version `v0.10.3`
 
@@ -28,4 +29,4 @@ Change the config values at the top, save the file, restart the game. Profit!
 - Run `git clone https://github.com/pixelcrisis/conductor.git`
 - `cd conductor` to get into the new directory.
 - Run `yarn install` to install esbuild for build purposes.
-- Run `yarn build` and copy `conductor/` to your mods folder.
+- Run `yarn build` and copy `conductor/` to your mods folder
