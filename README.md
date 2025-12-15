@@ -12,8 +12,10 @@ Download `conductor.zip` and extract it to your mods folder.
 ## What This Mod Does
 - **Blueprint Tracking:** Tracks Game Funds vs Blueprint Costs  
   Cash Icon will be gray when you can't afford your blueprints, yellow when you can afford them, and green when you can afford your blueprints + 100m for additional trains.  
+
+- **Edge Scrolling:** Automatically pan the map when the cursor is near the edge. Disabled by default, change the configs to enable.
   
-- Tweaks Game Settings ****(Requires Rebuilding The Mod!)***
+- **Tweaks Game Settings:** Any settings in `GAME` will overwrite the corresponding settings in the base Subway Builder game. Most common ones come pre-defined.
 
 ## Changing Configs
 Open your mods folder, and open `conductor/index.js` in your favorite text editor.  
@@ -26,4 +28,4 @@ Change the config values at the top, save the file, restart the game. Profit!
 - Run `git clone https://github.com/pixelcrisis/conductor.git`
 - `cd conductor` to get into the new directory.
 - Run `yarn install` to install esbuild for build purposes.
-- Run `yarn build` and copy `conductor/` to your mods folder
+- Run `yarn build` and copy `conductor/` to your mods folder.

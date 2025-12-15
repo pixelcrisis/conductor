@@ -2,7 +2,7 @@
 // Monitors Blueprints
 
 import CONFIG from "../config"
-const { COLORS, TRAIN_BUFFER } = CONFIG.MAIN
+const { COLORS, BUFFER } = CONFIG.MAIN.TRACKER
 
 const icon = `main > .absolute.bottom-0 .lucide-banknote`
 
@@ -19,7 +19,7 @@ export default (API) => {
 
   // define our state changes
   if (diff < 0) state = COLORS.POOR
-  else if (diff < TRAIN_BUFFER) state = COLORS.WARN
+  else if (diff < BUFFER) state = COLORS.WARN
   else if (state != COLORS.RICH) {
     // API.ui.showNotification('Blueprints Available!', 'success')
     state = window.Conductor.__blueprints = COLORS.RICH

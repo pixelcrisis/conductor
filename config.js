@@ -5,19 +5,21 @@ export default {
 
   // SUBWAY CONDUCTOR CONFIGS
   MAIN: {
-    // Blueprint Tracker 
-    // Default: 100000000
-    TRAIN_BUFFER: 100000000,
 
-    // Tracker Indicators
-    COLORS: {
-      POOR: '#a3a3a3',
-      RICH: '#6cbe45',
-      WARN: '#fccc0a',
+    // Blueprint Tracker
+    TRACKER: {
+      // Default 100000000
+      BUFFER: 100000000,
+      // Indicator Colors
+      COLORS: {
+        POOR: '#a3a3a3',
+        RICH: '#6cbe45',
+        WARN: '#fccc0a',
+      },
     },
 
+    // Edge Scrolling
     AUTO_PAN: {
-      // Auto Pan Area
       // Trigger Area Size
       // Default: 50 (Pixels)
       AREA: 50,

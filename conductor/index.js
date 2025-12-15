@@ -3,17 +3,19 @@
   var config_default = {
     // SUBWAY CONDUCTOR CONFIGS
     MAIN: {
-      // Blueprint Tracker 
-      // Default: 100000000
-      TRAIN_BUFFER: 1e8,
-      // Tracker Indicators
-      COLORS: {
-        POOR: "#a3a3a3",
-        RICH: "#6cbe45",
-        WARN: "#fccc0a"
+      // Blueprint Tracker
+      TRACKER: {
+        // Default 100000000
+        BUFFER: 1e8,
+        // Indicator Colors
+        COLORS: {
+          POOR: "#a3a3a3",
+          RICH: "#6cbe45",
+          WARN: "#fccc0a"
+        }
       },
+      // Edge Scrolling
       AUTO_PAN: {
-        // Auto Pan Area
         // Trigger Area Size
         // Default: 50 (Pixels)
         AREA: 50,
@@ -70,7 +72,7 @@
   };
 
   // src/tracker.js
-  var { COLORS, TRAIN_BUFFER } = config_default.MAIN;
+  var { COLORS, BUFFER } = config_default.MAIN.TRACKER;
   var icon = `main > .absolute.bottom-0 .lucide-banknote`;
   var tracker_default = (API2) => {
     const list = API2.gameState.getTracks();
@@ -80,7 +82,7 @@
     const cost = API2.gameState.calculateBlueprintCost(plan).totalCost;
     const diff = fund - cost;
     if (diff < 0) state = COLORS.POOR;
-    else if (diff < TRAIN_BUFFER) state = COLORS.WARN;
+    else if (diff < BUFFER) state = COLORS.WARN;
     else if (state != COLORS.RICH) {
       state = window.Conductor.__blueprints = COLORS.RICH;
     }
