@@ -18,7 +18,7 @@ export default (API, CONF) => {
 
   // overwrite game settings
   console.log(`>> Conductor: Overwriting Rules...`)
-  API.modifyConstants(CONF.GAME)
+  API.modifyConstants(CONF.TWEAKS)
   
   return { CONF }
 }

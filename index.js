@@ -1,7 +1,7 @@
 // Subway Conductor
 // for Subway Builder
 
-import configs from './config'
+import * as CONF from './config'
 
 import CONNECT from './src/connect'
 // import TOGGLES from './src/toggles'
@@ -12,7 +12,7 @@ let API = window.SubwayBuilderAPI
 
 const Conduct = () => {
   // connect to the API
-  let Conductor = window.Conductor = CONNECT(API, configs)
+  let Conductor = window.Conductor = CONNECT(API, CONF)
   if (!Conductor) return console.log(`>> Conductor Failed :: No API Access.`)
 
   // embed our menu

@@ -1,8 +1,7 @@
 // Conductor Tracker
 // Monitors Blueprints
 
-import CONFIG from "../config"
-const { COLORS, BUFFER } = CONFIG.MAIN.TRACKER
+import { TRACKER } from "../config"
 
 const TrackBlueprints = (API) => {
   const icon = `main > .absolute.bottom-0 .lucide-banknote`
@@ -17,11 +16,11 @@ const TrackBlueprints = (API) => {
   const diff = fund - cost
 
   // define our state changes
-  if (diff < 0) state = COLORS.POOR
-  else if (diff < BUFFER) state = COLORS.WARN
-  else if (state != COLORS.RICH) {
+  if (diff < 0) state = TRACKER.COLORS.POOR
+  else if (diff < TRACKER.BUFFER) state = TRACKER.COLORS.WARN
+  else if (state != TRACKER.COLORS.RICH) {
     API.ui.showNotification('Blueprints Available!', 'success')
-    state = window.Conductor.__blueprints = COLORS.RICH
+    state = window.Conductor.__blueprints = TRACKER.COLORS.RICH
   }
 
   // and apply them
@@ -36,17 +35,17 @@ const TrackDemand = (API) => {
   // figure out what time/demand we're in
   // and select the icon /color associated with it
   const hour = 0 // API.gameState.getCurrentHour()
-  if      (hour >= 22) { icon = 'moon';      state = COLORS.PM_OVER }
-  else if (hour >= 20) { icon = 'moon';      state = COLORS.PM_NITE }
-  else if (hour >= 19) { icon = 'sunset';    state = COLORS.PM_LATE }
-  else if (hour >= 16) { icon = 'briefcase'; state = COLORS.PM_PEAK }
-  else if (hour >= 15) { icon = 'briefcase'; state = COLORS.PM_RUSH }
-  else if (hour >= 10) { icon = 'sun';       state = COLORS.MID_DAY }
-  else if (hour >= 9)  { icon = 'briefcase'; state = COLORS.AM_LATE }
-  else if (hour >= 6)  { icon = 'briefcase'; state = COLORS.AM_PEAK }
-  else if (hour >= 5)  { icon = 'sunrise';   state = COLORS.AM_RUSH }
-  else if (hour >= 4)  { icon = 'moon';      state = COLORS.AM_NITE }
-  else                 { icon = 'moon';      state = COLORS.AM_OVER }
+  if      (hour >= 22) { icon = 'moon';      state = TRACKER.COLORS.PM_OVER }
+  else if (hour >= 20) { icon = 'moon';      state = TRACKER.COLORS.PM_NITE }
+  else if (hour >= 19) { icon = 'sunset';    state = TRACKER.COLORS.PM_LATE }
+  else if (hour >= 16) { icon = 'briefcase'; state = TRACKER.COLORS.PM_PEAK }
+  else if (hour >= 15) { icon = 'briefcase'; state = TRACKER.COLORS.PM_RUSH }
+  else if (hour >= 10) { icon = 'sun';       state = TRACKER.COLORS.MID_DAY }
+  else if (hour >= 9)  { icon = 'briefcase'; state = TRACKER.COLORS.AM_LATE }
+  else if (hour >= 6)  { icon = 'briefcase'; state = TRACKER.COLORS.AM_PEAK }
+  else if (hour >= 5)  { icon = 'sunrise';   state = TRACKER.COLORS.AM_RUSH }
+  else if (hour >= 4)  { icon = 'moon';      state = TRACKER.COLORS.AM_NITE }
+  else                 { icon = 'moon';      state = TRACKER.COLORS.AM_OVER }
 
   if (!icon) return
   let el = document.querySelectorAll(`${base}-${icon}`)

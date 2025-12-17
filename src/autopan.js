@@ -1,18 +1,17 @@
 // Conductor AutoPan
 // Automatic Edge Scrolling
 
-import config from '../config'
-const { AREA, SPEED, DISTANCE } = config.MAIN.AUTO_PAN
+import { AUTO_PAN } from '../config'
 
 export default (MAP) => {
   const Pan = (dx, dy) => {
     window.PANNING = setInterval(() => {
-      // pan the map by SPEED pixels
-      MAP.panBy([dx * DISTANCE, dy * DISTANCE])
-    }, SPEED)
+      // pan the map by DISTANCE pixels
+      MAP.panBy([dx * AUTO_PAN.DISTANCE, dy * AUTO_PAN.DISTANCE])
+    }, AUTO_PAN.SPEED)
   }
 
-  if (!AREA || !DISTANCE || !SPEED) return
+  if (!AUTO_PAN.AREA || !AUTO_PAN.DISTANCE || !AUTO_PAN.SPEED) return
 
   MAP.on('mousemove', e => {
     // get size of the window
@@ -25,14 +24,14 @@ export default (MAP) => {
 
     // check for mouse position
     // top edge, pan up
-    if (y < AREA) Pan(0, -1)
+    if (y < AUTO_PAN.AREA) Pan(0, -1)
     // bottom edge, pan down
     // the 104 is the height of the bottom bar
-    else if (y > s.height - AREA - 104) Pan(0, 1)
+    else if (y > s.height - AUTO_PAN.AREA - 104) Pan(0, 1)
     // left edge, pan left
-    else if (x < AREA) Pan(-1, 0)
+    else if (x < AUTO_PAN.AREA) Pan(-1, 0)
     // right edge, pan right
-    else if (x > s.width - AREA) Pan(1, 0)
+    else if (x > s.width - AUTO_PAN.AREA) Pan(1, 0)
   })
 
   MAP.on('mouseout', e => {
