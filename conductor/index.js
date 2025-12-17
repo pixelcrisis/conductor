@@ -96,6 +96,13 @@
     const cost = API2.gameState.calculateBlueprintCost(plan).totalCost;
     return fund - cost;
   };
+  var getCurrentHour = () => {
+    const elem = `main > .absolute.bottom-0 div.whitespace-nowrap div`;
+    const time = document.querySelectorAll(elem)[0].textContent;
+    const hour = parseInt(time.split(":")[0]);
+    const late = time.indexOf("PM") > -1;
+    return late ? hour + 12 : hour;
+  };
 
   // src/tracker.js
   var TrackBlueprints = (API2) => {
@@ -113,8 +120,8 @@
   };
   var TrackDemand = (API2) => {
     let icon, state;
-    const base = `main > .absolute.bottom-0 .lucide`;
-    const hour = 0;
+    const base = `main > .absolute.bottom-0 div.whitespace-nowrap div .lucide`;
+    const hour = getCurrentHour();
     if (hour >= 22) {
       icon = "moon";
       state = TRACKER.COLORS.PM_OVER;
@@ -150,7 +157,7 @@
       state = TRACKER.COLORS.AM_OVER;
     }
     if (!icon) return;
-    let el = document.querySelectorAll(`${base}-${icon}`);
+    let el = document.querySelectorAll(base);
     if (el && el[0]) el[0].style.color = state;
   };
   var tracker_default = (API2) => {
@@ -191,7 +198,7 @@
   Conduct();
   API.hooks.onGameInit(() => {
     if (window.Conductor.Loop) clearInterval(window.Conductor.Loop);
-    window.Conductor.Loop = setInterval(() => tracker_default(API), 2500);
+    window.Conductor.Loop = setInterval(() => tracker_default(API), 1e3);
   });
   API.hooks.onMapReady((map) => autopan_default(map));
 })();

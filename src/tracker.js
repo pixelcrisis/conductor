@@ -2,7 +2,7 @@
 // Monitors Blueprints
 
 import { TRACKER } from '../config'
-import { blueprintCost } from './toolkit'
+import { blueprintCost, getCurrentHour } from './toolkit'
 
 const TrackBlueprints = (API) => {
   let state = window.Conductor.__blueprints || TRACKER.COLORS.RICH
@@ -24,11 +24,12 @@ const TrackBlueprints = (API) => {
 
 const TrackDemand = (API) => {
   let icon, state
-  const base = `main > .absolute.bottom-0 .lucide`
+  const base = `main > .absolute.bottom-0 div.whitespace-nowrap div .lucide`
   
   // figure out what time/demand we're in
   // and select the icon /color associated with it
-  const hour = 0 // API.gameState.getCurrentHour()
+  // const hour = API.gameState.getCurrentHour()
+  const hour = getCurrentHour()
   if      (hour >= 22) { icon = 'moon';      state = TRACKER.COLORS.PM_OVER }
   else if (hour >= 20) { icon = 'moon';      state = TRACKER.COLORS.PM_NITE }
   else if (hour >= 19) { icon = 'sunset';    state = TRACKER.COLORS.PM_LATE }
@@ -42,7 +43,7 @@ const TrackDemand = (API) => {
   else                 { icon = 'moon';      state = TRACKER.COLORS.AM_OVER }
 
   if (!icon) return
-  let el = document.querySelectorAll(`${base}-${icon}`)
+  let el = document.querySelectorAll(base)
   if (el && el[0]) el[0].style.color = state
 }
 

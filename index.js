@@ -30,7 +30,7 @@ API.hooks.onGameInit(() => {
   // clear the loop if it exists
   if (window.Conductor.Loop) clearInterval(window.Conductor.Loop)
   // then define the loop
-  window.Conductor.Loop = setInterval(() => TRACKER(API), 2500)
+  window.Conductor.Loop = setInterval(() => TRACKER(API), 1000)
 })
 
 API.hooks.onMapReady((map) => AUTOPAN(map))

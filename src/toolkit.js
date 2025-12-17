@@ -10,3 +10,11 @@ export const blueprintCost = (API) => {
   const cost = API.gameState.calculateBlueprintCost(plan).totalCost
   return fund - cost
 }
+
+export const getCurrentHour = () => {
+  const elem = `main > .absolute.bottom-0 div.whitespace-nowrap div`
+  const time = document.querySelectorAll(elem)[0].textContent
+  const hour = parseInt(time.split(':')[0])
+  const late = time.indexOf('PM') > -1
+  return late ? hour + 12 : hour
+}
