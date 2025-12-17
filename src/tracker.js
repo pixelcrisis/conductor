@@ -1,19 +1,13 @@
 // Conductor Tracker
 // Monitors Blueprints
 
-import { TRACKER } from "../config"
+import { TRACKER } from '../config'
+import { blueprintCost } from './toolkit'
 
 const TrackBlueprints = (API) => {
+  let state = window.Conductor.__blueprints || TRACKER.COLORS.RICH
   const icon = `main > .absolute.bottom-0 .lucide-banknote`
-  // get blueprints
-  const list = API.gameState.getTracks()
-  const plan = list.filter(t => t.displayType == 'blueprint')
-  let state = window.Conductor.__blueprints || false
-
-  // calculate costs
-  const fund = API.gameState.getBudget()
-  const cost = API.gameState.calculateBlueprintCost(plan).totalCost
-  const diff = fund - cost
+  const diff = blueprintCost(API)
 
   // define our state changes
   if (diff < 0) state = TRACKER.COLORS.POOR

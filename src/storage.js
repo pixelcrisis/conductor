@@ -13,23 +13,21 @@ const _meld = (obj1, obj2) => {
   }
 }
 
-export default { 
-  Load: () => {
-    // fetch and parse data from localstorage
-    let data = window.localStorage.getItem('conductor')
-    if (!data) return false
+export const Load = () => {
+  // fetch and parse data from localstorage
+  let data = window.localStorage.getItem('conductor')
+  if (!data) return false
 
-    console.log(`>> Conductor: Loading DB...`)
-    return JSON.parse(data)
-  }, 
-
-  Meld: (conf, save) => {
-    _meld(conf, save) // deep merge save data
-  }, 
-  
-  Save: (data) => {
-    // save our configs to stoarge
-    window.localStorage.setItem('conductor', JSON.stringify(data))
-    console.log(`>> Conductor: DB Updated.`)
-  } 
+  console.log(`>> Conductor: Loading DB...`)
+  return JSON.parse(data)
 }
+
+export const Meld = (conf, save) => {
+  _meld(conf, save) // deep merge save data
+}
+
+export const Save = (data) => {
+  // save our configs to stoarge
+  window.localStorage.setItem('conductor', JSON.stringify(data))
+  console.log(`>> Conductor: DB Updated.`)
+} 

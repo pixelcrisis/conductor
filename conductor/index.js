@@ -88,15 +88,20 @@
     return { CONF };
   };
 
-  // src/tracker.js
-  var TrackBlueprints = (API2) => {
-    const icon = `main > .absolute.bottom-0 .lucide-banknote`;
+  // src/toolkit.js
+  var blueprintCost = (API2) => {
     const list = API2.gameState.getTracks();
     const plan = list.filter((t) => t.displayType == "blueprint");
-    let state = window.Conductor.__blueprints || false;
     const fund = API2.gameState.getBudget();
     const cost = API2.gameState.calculateBlueprintCost(plan).totalCost;
-    const diff = fund - cost;
+    return fund - cost;
+  };
+
+  // src/tracker.js
+  var TrackBlueprints = (API2) => {
+    let state = window.Conductor.__blueprints || TRACKER.COLORS.RICH;
+    const icon = `main > .absolute.bottom-0 .lucide-banknote`;
+    const diff = blueprintCost(API2);
     if (diff < 0) state = TRACKER.COLORS.POOR;
     else if (diff < TRACKER.BUFFER) state = TRACKER.COLORS.WARN;
     else if (state != TRACKER.COLORS.RICH) {
@@ -186,11 +191,7 @@
   Conduct();
   API.hooks.onGameInit(() => {
     if (window.Conductor.Loop) clearInterval(window.Conductor.Loop);
-    window.Conductor.Loop = setInterval(() => {
-      tracker_default(API);
-    }, 2500);
+    window.Conductor.Loop = setInterval(() => tracker_default(API), 2500);
   });
-  API.hooks.onMapReady((map) => {
-    autopan_default(map);
-  });
+  API.hooks.onMapReady((map) => autopan_default(map));
 })();
