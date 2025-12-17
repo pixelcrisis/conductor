@@ -9,9 +9,22 @@
         BUFFER: 1e8,
         // Indicator Colors
         COLORS: {
+          // Blueprints
           POOR: "#a3a3a3",
           RICH: "#6cbe45",
-          WARN: "#fccc0a"
+          WARN: "#fccc0a",
+          // Demand
+          AM_OVER: "#a3a3a3",
+          AM_NITE: "#6cbe45",
+          AM_RUSH: "#fccc0a",
+          AM_PEAK: "#fccc0a",
+          AM_LATE: "#6cbe45",
+          MID_DAY: "#6cbe45",
+          PM_RUSH: "#fccc0a",
+          PM_PEAK: "#fccc0a",
+          PM_LATE: "#6cbe45",
+          PM_NITE: "#a3a3a3",
+          PM_OVER: "#a3a3a3"
         }
       },
       // Edge Scrolling
@@ -73,8 +86,8 @@
 
   // src/tracker.js
   var { COLORS, BUFFER } = config_default.MAIN.TRACKER;
-  var icon = `main > .absolute.bottom-0 .lucide-banknote`;
-  var tracker_default = (API2) => {
+  var TrackBlueprints = (API2) => {
+    const icon = `main > .absolute.bottom-0 .lucide-banknote`;
     const list = API2.gameState.getTracks();
     const plan = list.filter((t) => t.displayType == "blueprint");
     let state = window.Conductor.__blueprints || false;
@@ -84,10 +97,57 @@
     if (diff < 0) state = COLORS.POOR;
     else if (diff < BUFFER) state = COLORS.WARN;
     else if (state != COLORS.RICH) {
+      API2.ui.showNotification("Blueprints Available!", "success");
       state = window.Conductor.__blueprints = COLORS.RICH;
     }
     let el = document.querySelectorAll(icon);
     if (el && el[0]) el[0].style.color = state;
+  };
+  var TrackDemand = (API2) => {
+    let icon, state;
+    const base = `main > .absolute.bottom-0 .lucide`;
+    const hour = 0;
+    if (hour >= 22) {
+      icon = "moon";
+      state = COLORS.PM_OVER;
+    } else if (hour >= 20) {
+      icon = "moon";
+      state = COLORS.PM_NITE;
+    } else if (hour >= 19) {
+      icon = "sunset";
+      state = COLORS.PM_LATE;
+    } else if (hour >= 16) {
+      icon = "briefcase";
+      state = COLORS.PM_PEAK;
+    } else if (hour >= 15) {
+      icon = "briefcase";
+      state = COLORS.PM_RUSH;
+    } else if (hour >= 10) {
+      icon = "sun";
+      state = COLORS.MID_DAY;
+    } else if (hour >= 9) {
+      icon = "briefcase";
+      state = COLORS.AM_LATE;
+    } else if (hour >= 6) {
+      icon = "briefcase";
+      state = COLORS.AM_PEAK;
+    } else if (hour >= 5) {
+      icon = "sunrise";
+      state = COLORS.AM_RUSH;
+    } else if (hour >= 4) {
+      icon = "moon";
+      state = COLORS.AM_NITE;
+    } else {
+      icon = "moon";
+      state = COLORS.AM_OVER;
+    }
+    if (!icon) return;
+    let el = document.querySelectorAll(`${base}-${icon}`);
+    if (el && el[0]) el[0].style.color = state;
+  };
+  var tracker_default = (API2) => {
+    TrackBlueprints(API2);
+    TrackDemand(API2);
   };
 
   // src/autopan.js

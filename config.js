@@ -12,9 +12,22 @@ export default {
       BUFFER: 100000000,
       // Indicator Colors
       COLORS: {
+        // Blueprints
         POOR: '#a3a3a3',
         RICH: '#6cbe45',
         WARN: '#fccc0a',
+        // Demand
+        AM_OVER: '#a3a3a3',
+        AM_NITE: '#6cbe45',
+        AM_RUSH: '#fccc0a',
+        AM_PEAK: '#fccc0a',
+        AM_LATE: '#6cbe45',
+        MID_DAY: '#6cbe45',
+        PM_RUSH: '#fccc0a',
+        PM_PEAK: '#fccc0a',
+        PM_LATE: '#6cbe45',
+        PM_NITE: '#a3a3a3',
+        PM_OVER: '#a3a3a3',
       },
     },
 
