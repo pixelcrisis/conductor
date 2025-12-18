@@ -98,7 +98,8 @@
   };
   var getCurrentHour = () => {
     const elem = `main > .absolute.bottom-0 div.whitespace-nowrap div`;
-    const time = document.querySelectorAll(elem)[0].textContent;
+    const time = document.querySelectorAll(elem)[0]?.textContent;
+    if (!time) return false;
     const hour = parseInt(time.split(":")[0]);
     const late = time.indexOf("PM") > -1;
     const noon = time.indexOf("12:") == 0;
@@ -120,7 +121,7 @@
     if (el && el[0]) el[0].style.color = color;
   };
   var TrackDemand = (API2) => {
-    const icon = `main > .absolute.bottom-0 .mt-auto > div > button > svg`;
+    const icon = `main > .absolute.bottom-0 .mt-auto .whitespace-nowrap svg`;
     let color;
     const hour = getCurrentHour();
     if (hour >= 22) {
@@ -148,9 +149,7 @@
     }
     if (!icon || !color) return;
     let el = document.querySelectorAll(icon);
-    if (el && el[0]) for (let i = 0; i < el.length; i++) {
-      el[i].style.fill = color;
-    }
+    if (el && el[0]) el[0].style.color = color;
   };
   var tracker_default = (API2) => {
     TrackBlueprints(API2);

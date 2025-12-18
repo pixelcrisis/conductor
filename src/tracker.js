@@ -23,10 +23,10 @@ const TrackBlueprints = (API) => {
 }
 
 const TrackDemand = (API) => {
-  const icon = `main > .absolute.bottom-0 .mt-auto > div > button > svg`
+  const icon = `main > .absolute.bottom-0 .mt-auto .whitespace-nowrap svg`
   
   // figure out what time/demand we're in
-  // and select the icon /color associated with it
+  // and select the color associated with it
   let color
   // const hour = API.gameState.getCurrentHour()
   const hour = getCurrentHour()
@@ -44,9 +44,7 @@ const TrackDemand = (API) => {
 
   if (!icon || !color) return
   let el = document.querySelectorAll(icon)
-  if (el && el[0]) for (let i = 0; i < el.length; i++) {
-    el[i].style.fill = color
-  }
+  if (el && el[0]) el[0].style.color = color
 }
 
 

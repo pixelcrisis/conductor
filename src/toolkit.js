@@ -13,7 +13,8 @@ export const blueprintCost = (API) => {
 
 export const getCurrentHour = () => {
   const elem = `main > .absolute.bottom-0 div.whitespace-nowrap div`
-  const time = document.querySelectorAll(elem)[0].textContent
+  const time = document.querySelectorAll(elem)[0]?.textContent
+  if (!time) return false
   const hour = parseInt(time.split(':')[0])
   const late = time.indexOf('PM') > -1
   const noon = time.indexOf('12:') == 0
