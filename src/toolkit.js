@@ -16,5 +16,6 @@ export const getCurrentHour = () => {
   const time = document.querySelectorAll(elem)[0].textContent
   const hour = parseInt(time.split(':')[0])
   const late = time.indexOf('PM') > -1
-  return late ? hour + 12 : hour
+  const noon = time.indexOf('12:') == 0
+  return late && !noon ? hour + 12 : hour
 }
