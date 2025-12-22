@@ -1,19 +1,21 @@
 // Conductor Toggles
 // The Options Menu UI
 
-const Options = () => {
-  return `(
-    <div className="p-4 bg-white dark:bg-gray-800 rounded">
-      <h3>My Mod Settings</h3>
-      <button onClick={() => console.log('Clicked!')}>
-        Do Something
-      </button>
-    </div>
-  )`;
-};
+const toggles = [
+  {
+    id: 'trackBlueprints', defaultValue: true,
+    label: 'Blueprint Tracker', onChange: (val) => {
+      console.log('Toggle Blueprints Clicked', val)
+    } 
+  },
+  {
+    id: 'trackDemand', defaultValue: true,
+    label: 'Demand Tracker', onChange: (val) => {
+      console.log('Toggle Demand Clicked', val)
+    }
+  }
+]
 
 export default (API) => {
-  API.ui.registerComponent('settings-menu', {
-    id: 'conductor-menu', component: Options
-  })
+  toggles.forEach(opt => API.ui.addToggle('settings-menu', opt))
 }

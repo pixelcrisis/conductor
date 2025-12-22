@@ -192,4 +192,18 @@
     window.Conductor.Loop = setInterval(() => tracker_default(API), 1e3);
   });
   API.hooks.onMapReady((map) => autopan_default(map));
+  API.registerNewspaperTemplates([
+    {
+      headline: "Montreal Metro Reaches {{STATIONS}} Stations",
+      content: "The STM celebrated today...",
+      metadata: {
+        category: "milestone",
+        tone: "celebratory",
+        requiredGameState: {
+          minStations: 10
+        },
+        weight: 8
+      }
+    }
+  ]);
 })();
