@@ -1,5 +1,5 @@
-// Conductor Toggles
-// The Options Menu UI
+/* Subway Conductor */
+/* User Settings UI */
 
 const toggles = [
   {

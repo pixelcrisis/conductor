@@ -1,36 +1,43 @@
-// Subway Conductor
-// for Subway Builder
+/* Subway Conductor */
+/* @ Subway Builder */
+/*  by pixelcrisis  */
 
-import * as CONF from './config'
+// grab our default settings
+import * as config from './config'
+// import our utilties
+import Connect from './utils/connect'
+import ApplyUI from './utils/visuals'
+// and finally the plugins
+import Demand from './plugins/demand'
+import Blueprints from './plugins/blueprints'
+import Panning from './plugins/panning'
 
-import CONNECT from './src/connect'
-// import TOGGLES from './src/toggles'
-import TRACKER from './src/tracker'
-import AUTOPAN from './src/autopan'
+// define the everything
+const initConductor = () => {
+  // api connection attempt
+  const api = window.SubwayBuilderAPI
+  let mod = window.Conductor = Connect(api, config)
+  if (!mod) return console.log(`>> Conductor Failed :: No API Access.`)
 
-let API = window.SubwayBuilderAPI
+  // embed the visuals
+  mod.menu = ApplyUI(api)
 
-const Conduct = () => {
-  // connect to the API
-  let Conductor = window.Conductor = CONNECT(API, CONF)
-  if (!Conductor) return console.log(`>> Conductor Failed :: No API Access.`)
+  // only run on game start
+  api.hooks.onGameInit(() => {
+    if (mod.loop) clearInterval(mod.loop)
+    // define our main loop
+    mod.loop = setInterval(() => {
+      Demand(api)
+      Blueprints(api)
+    }, 1000)
+  })
 
-  // embed our menu
-  // Conductor.MENU = TOGGLES(API)
+  // only run on map ready
+  api.hooks.onMapReady(map => Panning(map))
 
-  // and that's it! we're done!
-  console.log(`>> Conductor Successfully Activated!`)
+  // and that's all she wrote
+  console.log(`>> Conductor: Online.`)
 }
 
-// initialize the mod
-Conduct()
-
-API.hooks.onGameInit(() => {
-  // start the loop on gameInit
-  // clear the loop if it exists
-  if (window.Conductor.Loop) clearInterval(window.Conductor.Loop)
-  // then define the loop
-  window.Conductor.Loop = setInterval(() => TRACKER(API), 1000)
-})
-
-API.hooks.onMapReady((map) => AUTOPAN(map))
+// and let's go
+initConductor()

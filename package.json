@@ -1,6 +1,6 @@
 {
   "name": "conductor",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "Minor tweaks to enhance gameplay.",
   "main": "index.js",
   "author": "crisis",
@@ -9,6 +9,6 @@
     "esbuild": "^0.27.1"
   },
   "scripts": {
-    "build": "esbuild index.js --bundle --outdir=conductor"
+    "build": "esbuild index.js --bundle --outdir=dist"
   }
 }
