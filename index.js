@@ -6,34 +6,35 @@
 import * as config from './config'
 // import our utilties
 import Connect from './utils/connect'
-import ApplyUI from './utils/visuals'
+import AddMenu from './utils/addmenu'
+// and then our UI elements
+import SettingsView from './views/settings'
 // and finally the plugins
-import Demand from './plugins/demand'
-import Blueprints from './plugins/blueprints'
-import Panning from './plugins/panning'
+import TrackDemand from './plugins/demand'
+import TrackBlueprints from './plugins/blueprints'
+import AutoPanning from './plugins/panning'
 
 // define the everything
 const initConductor = () => {
   // api connection attempt
   const api = window.SubwayBuilderAPI
   let mod = window.Conductor = Connect(api, config)
-  if (!mod) return console.log(`>> Conductor Failed :: No API Access.`)
+  if (!mod) return console.log(`>> Conductor Failed: No API Access.`)
 
-  // embed the visuals
-  mod.menu = ApplyUI(api)
+  AddMenu(api, SettingsView, 'settings-menu') // embed the core menu
 
   // only run on game start
   api.hooks.onGameInit(() => {
     if (mod.loop) clearInterval(mod.loop)
     // define our main loop
     mod.loop = setInterval(() => {
-      Demand(api)
-      Blueprints(api)
+      TrackDemand(api)
+      TrackBlueprints(api)
     }, 1000)
   })
 
   // only run on map ready
-  api.hooks.onMapReady(map => Panning(map))
+  api.hooks.onMapReady(map => AutoPanning(map))
 
   // and that's all she wrote
   console.log(`>> Conductor: Online.`)

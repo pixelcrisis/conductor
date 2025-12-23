@@ -106,27 +106,37 @@
     return { db: storage_exports, config };
   };
 
-  // utils/visuals.js
-  var toggles = [
-    {
-      id: "trackBlueprints",
+  // utils/addmenu.js
+  var addmenu_default = (api, menu, target) => {
+    if (menu) for (let id in menu) {
+      const opt = menu[id], res = { id, ...opt };
+      if (opt.type == "button") api.ui.addButton(target, res);
+      if (opt.type == "toggle") api.ui.addToggle(target, res);
+      if (opt.type == "slider") api.ui.addSlider(target, res);
+      if (opt.type == "select") api.ui.addSelect(target, res);
+      if (opt.type == "sep") api.ui.addSeparator(target, res);
+      if (opt.type == "text") api.ui.addText(target, res);
+    }
+  };
+
+  // views/settings.js
+  var settings_default = {
+    trackBlueprints: {
+      type: "toggle",
       defaultValue: true,
-      label: "Blueprint Tracker",
+      label: "Conductor: Track Blueprints",
       onChange: (val) => {
-        console.log("Toggle Blueprints Clicked", val);
+        console.log("Toggle Blueprints Clicked!", val);
       }
     },
-    {
-      id: "trackDemand",
+    trackDemand: {
+      type: "toggle",
       defaultValue: true,
-      label: "Demand Tracker",
+      label: "Conductor: Track Demand",
       onChange: (val) => {
-        console.log("Toggle Demand Clicked", val);
+        console.log("Toggle Demand Clicked!", val);
       }
     }
-  ];
-  var visuals_default = (API) => {
-    toggles.forEach((opt) => API.ui.addToggle("settings-menu", opt));
   };
 
   // plugins/demand.js
@@ -211,8 +221,8 @@
   var initConductor = () => {
     const api = window.SubwayBuilderAPI;
     let mod = window.Conductor = connect_default(api, config_exports);
-    if (!mod) return console.log(`>> Conductor Failed :: No API Access.`);
-    mod.menu = visuals_default(api);
+    if (!mod) return console.log(`>> Conductor Failed: No API Access.`);
+    addmenu_default(api, settings_default, "settings-menu");
     api.hooks.onGameInit(() => {
       if (mod.loop) clearInterval(mod.loop);
       mod.loop = setInterval(() => {
