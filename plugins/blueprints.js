@@ -6,6 +6,7 @@ const icon = `main > .absolute.bottom-0 .lucide-banknote`
 export default api => {
   const mod = window.Conductor
   const cfg = mod.config.blueprints
+  if (!cfg.enable) return
   // get our default indicator color
   let active = mod.$blueprints || cfg.colors.max
 

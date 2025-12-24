@@ -11,7 +11,7 @@ export default map => {
     }, cfg.speed)
   }
 
-  if (!cfg.area || !cfg.distance || !cfg.speed) return
+  if (!cfg.enable || !cfg.area || !cfg.distance || !cfg.speed) return
 
   map.on('mousemove', e => {
     const size = map.getCanvas().getBoundingClientRect()

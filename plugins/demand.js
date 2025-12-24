@@ -3,6 +3,7 @@
 
 export default api => {
   const cfg = window.Conductor.config.demand
+  if (!cfg.enable) return
   let active, hour = api.gameState.getCurrentHour()
   const icon = `main > .absolute.bottom-0 .mt-auto .whitespace-nowrap svg`
   
