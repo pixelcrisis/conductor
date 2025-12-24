@@ -9,6 +9,7 @@ const __red     = '#ff6319'
 
 // Blueprint Tracking
 export const blueprints = {
+  enable: true,
   buffer: 100000000,
   colors: {
     nil: __gray,
@@ -19,6 +20,7 @@ export const blueprints = {
 
 // Demand Tracking
 export const demand = {
+  enable: true,
   amOver: __gray,
   amNite: __green,
   amRush: __yellow,
@@ -34,6 +36,7 @@ export const demand = {
 
 // Edge Panning
 export const panning = {
+  enable: true,
   area: 50,
   distance: 100,
   speed: 500
