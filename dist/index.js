@@ -163,6 +163,22 @@
   </div>
 `;
 
+  // package.json
+  var package_default = {
+    name: "conductor",
+    version: "0.4.0",
+    description: "Minor tweaks to enhance gameplay.",
+    main: "index.js",
+    author: "crisis",
+    license: "MIT",
+    dependencies: {
+      esbuild: "^0.27.1"
+    },
+    scripts: {
+      build: "esbuild index.js --bundle --outdir=dist"
+    }
+  };
+
   // views/panel.js
   var tabA = { name: "Mod Options", body: `Mod` };
   var tabB = { name: "Game Tweaks", body: `Game` };
@@ -170,7 +186,8 @@
   <div id="conductMenu" class="hidden absolute" 
     style="top:65px; right:16px; width: 322px; max-width: 50%;">
     
-    ${box_default("Subway Conductor", tabs_default(tabA, tabB))}
+    ${box_default(`Subway Conductor: v${package_default.version}`, tabs_default(tabA, tabB))}
+    
 
   </div>
 `;
@@ -235,6 +252,7 @@
   // plugins/demand.js
   var demand_default = (api) => {
     const cfg = window.Conductor.config.demand;
+    if (!cfg.enable) return;
     let active, hour = api.gameState.getCurrentHour();
     const icon3 = `main > .absolute.bottom-0 .mt-auto .whitespace-nowrap svg`;
     if (hour >= 22) {
@@ -270,6 +288,7 @@
   var blueprints_default = (api) => {
     const mod = window.Conductor;
     const cfg = mod.config.blueprints;
+    if (!cfg.enable) return;
     let active = mod.$blueprints || cfg.colors.max;
     const list = api.gameState.getTracks();
     const plan = list.filter((t) => t.displayType == "blueprint");
@@ -294,7 +313,7 @@
         map.panBy([dX * cfg.distance, dY * cfg.distance]);
       }, cfg.speed);
     };
-    if (!cfg.area || !cfg.distance || !cfg.speed) return;
+    if (!cfg.enable || !cfg.area || !cfg.distance || !cfg.speed) return;
     map.on("mousemove", (e) => {
       const size = map.getCanvas().getBoundingClientRect();
       const lenX = e.point.x - size.left;
