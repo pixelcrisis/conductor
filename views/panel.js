@@ -3,17 +3,22 @@
 
 import box from './partials/box'
 import tabs from './partials/tabs'
+
 import mod from '../package.json'
+import settings from './settings'
+import tweaks from './tweaks'
 
-const tabA = { name: 'Mod Options', body: `Mod` }
-const tabB = { name: 'Game Tweaks', body: `Game` }
+const tabA = { name: 'Mod Options', body: settings }
+const tabB = { name: 'Game Tweaks', body: tweaks }
 
-export default `
+export default () => `
   <div id="conductMenu" class="hidden absolute" 
     style="top:65px; right:16px; width: 322px; max-width: 50%;">
-    
-    ${ box(`Subway Conductor: v${ mod.version }`, tabs(tabA, tabB)) }
-    
 
+    ${ box({
+      head: `Subway Conductor Options`,
+      body: tabs(tabA, tabB)
+    }) }
+    
   </div>
 `

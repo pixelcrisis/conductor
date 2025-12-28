@@ -69,22 +69,37 @@
   __export(storage_exports, {
     load: () => load,
     merge: () => merge,
-    save: () => save
+    save: () => save,
+    update: () => update
   });
   var load = () => {
     let data = window.localStorage.getItem("conductor");
     if (!data) return false;
-    console.log(`>> Conductor: Reading Notes...`);
+    console.log(`>> Conductor: Reading DB...`);
     return JSON.parse(data);
   };
   var save = (cfg) => {
     let data = JSON.stringify(cfg);
     window.localStorage.setItem("conductor", data);
-    console.log(`>> Conductor: Updated Notes.`);
+    console.log(`>> Conductor: Updated DB.`);
   };
   var merge = (cfg, data) => {
     __meld(cfg, data);
     save(cfg);
+  };
+  var update = (key, val) => {
+    key = key.split("-");
+    let api = window.SubwayBuilderAPI;
+    let cfg = window.Conductor.config;
+    if (key.length == 2) {
+      cfg[key[0]][key[1]] = val;
+      if (key[0] == "tweaks") api.modifyConstants({ [key[1]]: val });
+    } else {
+      cfg[key[0]][key[1]] = val;
+      if (key[0] == "tweaks") api.modifyConstants({ [key[1]]: { [key[2]]: val } });
+    }
+    console.log(`>> Conductor: Set ${key.join(".")} to ${val}`);
+    window.Conductor.db.save(cfg);
   };
   var __test = (obj1, obj2, key) => {
     if (!obj1.hasOwnProperty(key)) return false;
@@ -92,7 +107,7 @@
   };
   var __meld = (obj1, obj2) => {
     for (let key in obj2) {
-      if (__test(obj1, obj2, key)) _meld(obj1[key], obj2[key]);
+      if (__test(obj1, obj2, key)) __meld(obj1[key], obj2[key]);
       else obj1[key] = obj2[key];
     }
   };
@@ -110,12 +125,13 @@
   };
 
   // views/partials/box.js
-  var box_default = (head, body) => `
+  var box_default = (data) => {
+    return `
   <div class="pointer-events-auto backdrop-blur-sm border border-border/50 h-fit rounded-lg text-sm items-center justify-center shadow-lg overflow-hidden bg-transparent w-full max-h-full flex flex-col">
     <div class="flex h-9 min-h-9 w-full p-1 border-b border-primary/15 items-center justify-between bg-primary-foreground">
       <div class="flex items-center h-full w-full"></div>
       <div class="flex items-center h-full w-full">
-        <h1 class="font-semibold whitespace-nowrap"> ${head} </h1>
+        <h1 class="font-semibold whitespace-nowrap"> ${data.head} </h1>
       </div>
       <div class="flex items-center h-full w-full gap-1 justify-end">
         <div class="flex items-center h-full w-fit">
@@ -130,12 +146,15 @@
     <div class="max-h-full overflow-auto">
       <div class="p-2 flex bg-primary-foreground/60 backdrop-blur-sm max-h-auto overflow-auto min-w-80 justify-center">
         <div class="flex flex-col gap-3 w-full max-w-full">
-          ${body}
+          ${data.body}
+
+          <div class="pt-2 border-t"></div>
         </div>
       </div>
     </div>
   </div>
 `;
+  };
 
   // views/partials/tabs.js
   var tabs_default = (tabA2, tabB2) => `
@@ -152,43 +171,184 @@
 
   <div id="tabA" class="flex flex-col gap-4">
     <div class="flex flex-col gap-2 w-full px-1">
-      ${tabA2.body}
+      ${tabA2.body()}
     </div>
   </div>
 
   <div id="tabB" class="flex flex-col gap-4 hidden">
     <div class="flex flex-col gap-2 w-full px-1">
-      ${tabB2.body}
+      ${tabB2.body()}
     </div>
   </div>
 `;
 
-  // package.json
-  var package_default = {
-    name: "conductor",
-    version: "0.4.0",
-    description: "Minor tweaks to enhance gameplay.",
-    main: "index.js",
-    author: "crisis",
-    license: "MIT",
-    dependencies: {
-      esbuild: "^0.27.1"
-    },
-    scripts: {
-      build: "esbuild index.js --bundle --outdir=dist"
-    }
+  // views/partials/base.js
+  var toggle = (data) => {
+    const str = data.value ? "Enabled" : "Disabled";
+    return `<div class="flex items-center justify-between gap-2">
+    <span class="text-xs font-bold uppercase text-muted-foreground">${data.name}</span>
+    <span class="text-xs cursor-pointer hover:underline" 
+      onclick="this.nextElementSibling.checked = !this.nextElementSibling.checked;
+      this.innerText = this.nextElementSibling.checked ? 'Enabled' : 'Disabled'; 
+      window.Conductor.db.update('${data.key}', this.nextElementSibling.checked);">
+      ${str}
+    </span>
+    <input type="checkbox" class="sr-only" checked="${data.value}">
+  </div>`;
+  };
+  var number = (data) => {
+    const str = data.cash ? "$" : "";
+    return `<span class="text-xs font-bold text-muted-foreground pt-1">${data.name}</span>
+  <div class="flex items-center justify-between gap-2" style="margin-top: -0.75rem">
+    <input type="range" 
+      value="${data.value}" 
+      min="${data.min}" max="${data.max}" step="${data.step}"
+      onchange="window.Conductor.db.update('${data.key}', parseInt(this.value))"
+      oninput="this.nextElementSibling.value = '${str}' + parseInt(this.value).toLocaleString()"
+      class="rounded-md border border-input px-3 py-2 bg-background text-right text-xs" />
+    <output class="text-xs font-bold text-muted-foreground">
+      ${str}${data.value.toLocaleString()}
+    </output>
+  </div>`;
+  };
+
+  // views/settings.js
+  var settings_default = () => {
+    let config = window.Conductor.config;
+    return `
+  <div class="mt-1 pt-1 border-t"></div>
+
+  ${toggle({
+      key: "demand-enable",
+      name: "Demand Tracker",
+      value: config.demand.enable
+    })}
+
+  <div class="mt-1 pt-1 border-t"></div>
+
+  ${toggle({
+      key: "blueprints-enable",
+      name: "Blueprint Tracker",
+      value: config.blueprints.enable
+    })}
+  ${number({
+      key: "blueprints-buffer",
+      name: "Train Buffer",
+      cash: true,
+      value: config.blueprints.buffer,
+      min: 0,
+      max: 1e9,
+      step: 1e7
+    })}
+
+  <div class="mt-1 pt-1 border-t"></div>
+
+  ${toggle({
+      key: "panning-enable",
+      name: "Map Edge Scrolling",
+      value: config.panning.enable
+    })}
+  ${number({
+      key: "panning-area",
+      name: "Edge Width (px)",
+      value: config.panning.area,
+      min: 0,
+      max: 150,
+      step: 5
+    })}
+  ${number({
+      key: "panning-distance",
+      name: "Panning Distance (px)",
+      value: config.panning.distance,
+      min: 0,
+      max: 1e3,
+      step: 10
+    })}
+  ${number({
+      key: "panning-speed",
+      name: "Panning Speed (ms)",
+      value: config.panning.speed,
+      min: 0,
+      max: 2e3,
+      step: 100
+    })}
+  `;
+  };
+
+  // views/tweaks.js
+  var tweaks_default = () => {
+    let config = window.Conductor.config;
+    return `
+  <div class="mt-1 pt-1 border-t"></div>
+
+  ${number({
+      key: "tweaks-STARTING_MONEY",
+      name: "Starting Money (Default $3b)",
+      value: config.tweaks.STARTING_MONEY,
+      cash: true,
+      min: 1e9,
+      max: 1e10,
+      step: 5e8
+    })}
+  ${number({
+      key: "tweaks-STARTING_TRAIN_CARS",
+      name: "Starting Train Cars (Default 30)",
+      value: config.tweaks.STARTING_TRAIN_CARS,
+      min: 0,
+      max: 100,
+      step: 5
+    })}
+  ${number({
+      key: "tweaks-DEFAULT_TICKET_COST",
+      name: "Default Ticket Cost (Default $3)",
+      value: config.tweaks.DEFAULT_TICKET_COST,
+      min: 0.5,
+      max: 10,
+      step: 0.5,
+      cash: true
+    })}
+
+  <div class="mt-1 pt-1 border-t"></div>
+
+  ${number({
+      key: "tweaks-MIN_TRACK_LENGTH",
+      name: "Min Track Length (Default 10)",
+      value: config.tweaks.MIN_TRACK_LENGTH,
+      min: 0,
+      max: 50,
+      step: 1
+    })}
+  ${number({
+      key: "tweaks-MIN_TURN_RADIUS",
+      name: "Min Turn Radius (Default 29)",
+      value: config.tweaks.MIN_TURN_RADIUS,
+      min: 0,
+      max: 50,
+      step: 1
+    })}
+  ${number({
+      key: "tweaks-MAX_SLOPE_PERCENTAGE",
+      name: "Max Slope % (Default 4)",
+      value: config.tweaks.MAX_SLOPE_PERCENTAGE,
+      min: 0,
+      max: 10,
+      step: 1
+    })}
+  `;
   };
 
   // views/panel.js
-  var tabA = { name: "Mod Options", body: `Mod` };
-  var tabB = { name: "Game Tweaks", body: `Game` };
-  var panel_default = `
+  var tabA = { name: "Mod Options", body: settings_default };
+  var tabB = { name: "Game Tweaks", body: tweaks_default };
+  var panel_default = () => `
   <div id="conductMenu" class="hidden absolute" 
     style="top:65px; right:16px; width: 322px; max-width: 50%;">
-    
-    ${box_default(`Subway Conductor: v${package_default.version}`, tabs_default(tabA, tabB))}
-    
 
+    ${box_default({
+    head: `Subway Conductor Options`,
+    body: tabs_default(tabA, tabB)
+  })}
+    
   </div>
 `;
 
@@ -204,12 +364,12 @@
   </button>
 `;
   var game = `
-  <div id="gameConduct" onclick="window.showConductor()" class="pointer-events-auto bg-background/95 backdrop-blur-sm border border-border/50 rounded-lg text-sm flex items-center justify-center shadow-lg overflow-hidden w-10 h-10 p-2 cursor-pointer hover:bg-secondary">
+  <div id="gameConduct" onclick="window.showConductor()" class="pointer-events-auto bg-primary-foreground backdrop-blur-sm border border-border/50 rounded-lg text-sm flex items-center justify-center shadow-lg overflow-hidden w-10 h-10 p-2 cursor-pointer hover:bg-secondary">
     ${icon("1.5rem")}
   </div>
 `;
   var mTop = ".absolute.top-4.right-4.z-20";
-  var gTop = 'div[data-mod-id="top-bar"]:first-child .ml-auto';
+  var gTop = "main > .absolute.bottom-0 .max-h-full .max-h-full .ml-auto";
   var showConductor = () => {
     let menu = document.querySelector("#conductMenu");
     let icon3 = document.querySelector("#gameConduct");
@@ -246,14 +406,14 @@
     }
     let root = document.querySelector("#root");
     let menu = document.querySelector("#conductMenu");
-    if (!menu) root.insertAdjacentHTML("beforeend", panel_default);
+    if (!menu) root.insertAdjacentHTML("beforeend", panel_default());
   };
 
   // plugins/demand.js
   var demand_default = (api) => {
     const cfg = window.Conductor.config.demand;
     if (!cfg.enable) return;
-    let active, hour = api.gameState.getCurrentHour();
+    let active, hour = getCurrentHour();
     const icon3 = `main > .absolute.bottom-0 .mt-auto .whitespace-nowrap svg`;
     if (hour >= 22) {
       active = cfg.pmOver;
@@ -281,6 +441,15 @@
     if (!active) return;
     let el = document.querySelectorAll(icon3);
     if (el && el[0]) el[0].style.color = active;
+  };
+  var getCurrentHour = () => {
+    const elem = `main > .absolute.bottom-0 div.whitespace-nowrap div`;
+    const time = document.querySelectorAll(elem)[0]?.textContent;
+    if (!time) return false;
+    const hour = parseInt(time.split(":")[0]);
+    const late = time.indexOf("PM") > -1;
+    const noon = time.indexOf("12:") == 0;
+    return late && !noon ? hour + 12 : hour;
   };
 
   // plugins/blueprints.js

@@ -13,13 +13,14 @@ export const main = `
 `
 
 export const game = `
-  <div id="gameConduct" onclick="window.showConductor()" class="pointer-events-auto bg-background/95 backdrop-blur-sm border border-border/50 rounded-lg text-sm flex items-center justify-center shadow-lg overflow-hidden w-10 h-10 p-2 cursor-pointer hover:bg-secondary">
+  <div id="gameConduct" onclick="window.showConductor()" class="pointer-events-auto bg-primary-foreground backdrop-blur-sm border border-border/50 rounded-lg text-sm flex items-center justify-center shadow-lg overflow-hidden w-10 h-10 p-2 cursor-pointer hover:bg-secondary">
     ${ icon('1.5rem') }
   </div>
 `
 
 export const mTop = '.absolute.top-4.right-4.z-20'
-export const gTop = 'div[data-mod-id="top-bar"]:first-child .ml-auto'
+export const gTop = 'main > .absolute.bottom-0 .max-h-full .max-h-full .ml-auto'
+// export const gTop = 'div[data-mod-id="top-bar"]:first-child .ml-auto'
 
 export const showConductor = () => {
   let menu = document.querySelector('#conductMenu')

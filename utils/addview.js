@@ -21,5 +21,5 @@ export default () => {
   // and then adding our menu
   let root = document.querySelector('#root')
   let menu = document.querySelector('#conductMenu')
-  if (!menu) root.insertAdjacentHTML('beforeend', panel)
+  if (!menu) root.insertAdjacentHTML('beforeend', panel())
 }

@@ -1,12 +1,13 @@
 /* Subway Conductor */
 /* Panel Copying / Templates */
 
-export default (head, body) => `
+export default data => {
+  return `
   <div class="pointer-events-auto backdrop-blur-sm border border-border/50 h-fit rounded-lg text-sm items-center justify-center shadow-lg overflow-hidden bg-transparent w-full max-h-full flex flex-col">
     <div class="flex h-9 min-h-9 w-full p-1 border-b border-primary/15 items-center justify-between bg-primary-foreground">
       <div class="flex items-center h-full w-full"></div>
       <div class="flex items-center h-full w-full">
-        <h1 class="font-semibold whitespace-nowrap"> ${ head } </h1>
+        <h1 class="font-semibold whitespace-nowrap"> ${ data.head } </h1>
       </div>
       <div class="flex items-center h-full w-full gap-1 justify-end">
         <div class="flex items-center h-full w-fit">
@@ -21,9 +22,12 @@ export default (head, body) => `
     <div class="max-h-full overflow-auto">
       <div class="p-2 flex bg-primary-foreground/60 backdrop-blur-sm max-h-auto overflow-auto min-w-80 justify-center">
         <div class="flex flex-col gap-3 w-full max-w-full">
-          ${ body }
+          ${ data.body }
+
+          <div class="pt-2 border-t"></div>
         </div>
       </div>
     </div>
   </div>
 `
+}

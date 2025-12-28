@@ -4,7 +4,7 @@
 export default api => {
   const cfg = window.Conductor.config.demand
   if (!cfg.enable) return
-  let active, hour = api.gameState.getCurrentHour()
+  let active, hour = getCurrentHour() // api.gameState.getCurrentHour()
   const icon = `main > .absolute.bottom-0 .mt-auto .whitespace-nowrap svg`
   
   if      (hour >= 22) { active = cfg.pmOver }
@@ -22,4 +22,14 @@ export default api => {
   if (!active) return
   let el = document.querySelectorAll(icon)
   if (el && el[0]) el[0].style.color = active
+}
+
+const getCurrentHour = () => {
+  const elem = `main > .absolute.bottom-0 div.whitespace-nowrap div`
+  const time = document.querySelectorAll(elem)[0]?.textContent
+  if (!time) return false
+  const hour = parseInt(time.split(':')[0])
+  const late = time.indexOf('PM') > -1
+  const noon = time.indexOf('12:') == 0
+  return late && !noon ? hour + 12 : hour
 }

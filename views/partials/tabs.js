@@ -15,13 +15,13 @@ export default (tabA, tabB) => `
 
   <div id="tabA" class="flex flex-col gap-4">
     <div class="flex flex-col gap-2 w-full px-1">
-      ${ tabA.body }
+      ${ tabA.body() }
     </div>
   </div>
 
   <div id="tabB" class="flex flex-col gap-4 hidden">
     <div class="flex flex-col gap-2 w-full px-1">
-      ${ tabB.body }
+      ${ tabB.body() }
     </div>
   </div>
 `
