@@ -2,7 +2,7 @@
     "id": "com.crisis.conductor",
     "name": "Subway Conductor",
     "description": "Minor tweaks to enhance gameplay.",
-    "version": "0.4.0",
+    "version": "0.5.0",
     "author": { "name": "crisis" },
     "main": "index.js"
 }

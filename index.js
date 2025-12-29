@@ -1,42 +1,46 @@
-/* Subway Conductor */
-/* @ Subway Builder */
-/*  by pixelcrisis  */
+/**
+ * Subway Conductor
+ * For Subway Builder
+ * A mod by pixelcrisis
+ */
 
-// grab our default settings
+// we'll need our default configs
 import * as config from './config'
-// import our utilties
-import Connect from './utils/connect'
-import AddView from './utils/addview'
-// and finally the plugins
-import TrackDemand from './plugins/demand'
-import TrackBlueprints from './plugins/blueprints'
-import AutoPanning from './plugins/panning'
+import { version } from './package.json'
+// and we'll have to grab our utils
+import $connect from './utils/connect'
+// the plugins are the important bits
+import $trackDemand from './plugins/demand'
+import $trackBlueprints from './plugins/blueprints'
+import $handlePanning from './plugins/panning'
 
-// define the everything
-const initConductor = () => {
+// let's go
+(function(){
   // api connection attempt
   const api = window.SubwayBuilderAPI
-  let mod = window.Conductor = Connect(api, config)
-  if (!mod) return console.log(`>> Conductor Failed: No API Access.`)
+  let   mod = window.Conductor = $connect(api, config)
+  if   (mod)  mod.version = version
+  else return console.log('>> Conductor Err: No API Access.')
 
-  AddView() // embed on main menu
+  mod.$addUI() // embed on main page
 
-  // only run on game start
   api.hooks.onGameInit(() => {
-    AddView() // embed on game start
+    mod.$addUI() // embed on game page
     if (mod.loop) clearInterval(mod.loop)
-    // define our main loop
+    // define our game loop
     mod.loop = setInterval(() => {
-      TrackDemand(api)
-      TrackBlueprints(api)
+      // looping plugins
+      $trackDemand()
+      $trackBlueprints()
     }, 1000)
   })
 
-  // only run on map ready
-  api.hooks.onMapReady(map => AutoPanning(map))
+  api.hooks.onMapReady(map => {
+    $handlePanning(map)
+  })
 
-  // and that's all she wrote
-  console.log(`>> Conductor: Online.`)
-}
-
-initConductor() // and let's go
+  // clean up game time loops
+  api.hooks.onGameEnd(() => {
+    if (mod.loop) clearInterval(mod.loop)
+  })
+})()

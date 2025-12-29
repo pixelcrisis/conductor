@@ -39,7 +39,7 @@ export const panning = {
   enable: true,
   area: 50,
   distance: 100,
-  speed: 500
+  delay: 500
 }
 
 // Game Tweaks

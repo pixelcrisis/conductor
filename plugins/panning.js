@@ -1,36 +1,37 @@
-/* Subway Conductor */
-/* Auto Map Panning */
+/**
+ * Subway Conductor
+ * Auto Map Panning
+ * at Edge Detection
+ */
 
 export default map => {
-  const mod = window.Conductor
-  const cfg = mod.config.panning
+  let mod = window.Conductor
+  let config = mod.config.panning
 
+  if (!config.enable) return
+  if (!config.area || !config.distance) return
+
+  // define our panning function
   const Pan = (dX, dY) => {
-    window.$panning = setInterval(() => {
-      map.panBy([ dX * cfg.distance, dY * cfg.distance ])
-    }, cfg.speed)
+    window.__panning = setInterval(() => {
+      map.panBy([ dX * config.distance, dY * config.distance ])
+    }, config.delay)
   }
 
-  if (!cfg.enable || !cfg.area || !cfg.distance || !cfg.speed) return
-
   map.on('mousemove', e => {
-    const size = map.getCanvas().getBoundingClientRect()
-    const lenX = e.point.x - size.left
-    const lenY = e.point.y - size.top
+    let size = map.getCanvas().getBoundingClientRect()
+    let lenX = e.point.x - size.left
+    let lenY = e.point.y - size.top
 
-    if (window.$panning) clearInterval(window.$panning)
+    if (window.__panning) clearInterval(window.__panning)
 
-    // top edge, pan up
-    if (lenY < cfg.area) Pan(0, -1)
-    // bottom edge (104 for bottom bar), pan down
-    else if (lenY > (size.height - cfg.area - 104)) Pan(0, 1)
-    // left edge, pan left
-    else if (lenX < cfg.area) Pan (-1, 0)
-    // right edge, pan right
-    else if (lenX > size.width - cfg.area) Pan(1, 0)
+    if (lenY < config.area) Pan(0, -1)
+    else if (lenY > (size.height - config.area - 104)) Pan(0, 1)
+    else if (lenX < config.area) Pan(-1, 0)
+    else if (lenX > size.width - config.area) Pan(1, 0)
   })
 
-  map.on('mouseout', e => {
-    if (window.$panning) clearInterval(window.$panning)
+  map.on('mouseout', () => {
+    if (window.__panning) clearInterval(window.__panning)
   })
 }

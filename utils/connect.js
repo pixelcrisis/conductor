@@ -1,22 +1,27 @@
-/* Subway Conductor */
-/*  API Connection  */
+/**
+ * Subway Conductor
+ * Game API Connection
+ * Storage Injection
+ */
 
-import * as db from './storage'
+// grab database for injection
+import * as $db from './storage'
+import * as $ui from './addmenu'
 
 export default (api, config) => {
-  // make sure the API is valid
-  console.log(`>> Conductor: Checking for API...`)
-  if (!api || !api.version) return false
-  console.log(`>> Conductor: Connected to API v${ api.version }`)
+  // make sure we're actually connected
+  console.log('>> Conductor: Checking or API...')
+  if (!api || !api.version) return false // no API
+  console.log('>> Conductor: Found API v' + api.version)
 
-  // load/update data
-  let data = db.load()
-  if (data) db.merge(config, data)
+  // load data
+  let data = $db.$load()
+  if (data)  $db.$migrate(config, data)
 
   // overwrite game settings
-  console.log(`>> Conductor: Tweaking Settings`)
+  console.log('>> Conductor: Tweaking Settings...')
   api.modifyConstants(config.tweaks)
 
-  // add utilities into object
-  return { db, config }
+  // return our mod
+  return { ...$db, ...$ui, config }
 }

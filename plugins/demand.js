@@ -1,35 +1,33 @@
-/* Subway Conductor */
-/*  Demand Tracker  */
+/**
+ * Subway Conductor
+ * Demand Tracker
+ */
 
-export default api => {
-  const cfg = window.Conductor.config.demand
-  if (!cfg.enable) return
-  let active, hour = getCurrentHour() // api.gameState.getCurrentHour()
-  const icon = `main > .absolute.bottom-0 .mt-auto .whitespace-nowrap svg`
+export default () => {
+  let mod = window.Conductor
+  let config = mod.config.demand
+  const api = window.SubwayBuilderAPI
+
+  let color = config.pmOver
+  let icon = 'main > .absolute.bottom-0 .mt-auto .whitespace-nowrap svg' 
   
-  if      (hour >= 22) { active = cfg.pmOver }
-  else if (hour >= 20) { active = cfg.pmNite }
-  else if (hour >= 19) { active = cfg.pmLate }
-  else if (hour >= 16) { active = cfg.pmPeak }
-  else if (hour >= 15) { active = cfg.pmRush }
-  else if (hour >= 10) { active = cfg.midDay }
-  else if (hour >= 9)  { active = cfg.amLate }
-  else if (hour >= 6)  { active = cfg.amPeak }
-  else if (hour >= 5)  { active = cfg.amRush }
-  else if (hour >= 4)  { active = cfg.amNite }
-  else                 { active = cfg.amOver }
+  if (config.enable) {
+    let hour = api.gameState.getCurrentHour()
+    // match hour to correct color
+    if      (hour >= 22) { color = config.pmOver }
+    else if (hour >= 20) { color = config.pmNite }
+    else if (hour >= 19) { color = config.pmLate }
+    else if (hour >= 16) { color = config.pmPeak }
+    else if (hour >= 15) { color = config.pmRush }
+    else if (hour >= 10) { color = config.midDay }
+    else if (hour >= 9)  { color = config.amLate }
+    else if (hour >= 6)  { color = config.amPeak }
+    else if (hour >= 5)  { color = config.amRush }
+    else if (hour >= 4)  { color = config.amNite }
+    else                 { color = config.amOver }
+  }
 
-  if (!active) return
-  let el = document.querySelectorAll(icon)
-  if (el && el[0]) el[0].style.color = active
-}
-
-const getCurrentHour = () => {
-  const elem = `main > .absolute.bottom-0 div.whitespace-nowrap div`
-  const time = document.querySelectorAll(elem)[0]?.textContent
-  if (!time) return false
-  const hour = parseInt(time.split(':')[0])
-  const late = time.indexOf('PM') > -1
-  const noon = time.indexOf('12:') == 0
-  return late && !noon ? hour + 12 : hour
+  // apply our selected color
+  let elem = document.querySelectorAll(icon)
+  if (elem[0]) elem[0].style.color = color
 }
