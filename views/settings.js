@@ -10,7 +10,7 @@ export default () => {
   return `
   ${ el.toggle({
       key: 'demand-enable',
-      name: 'Demand Tracker',
+      name: 'DEMAND TRACKER',
       value: config.demand.enable
     }) }
   
@@ -18,7 +18,7 @@ export default () => {
   
     ${ el.toggle({
       key: 'blueprints-enable',
-      name: 'Blueprint Tracker',
+      name: 'BLUEPRINT TRACKER',
       value: config.blueprints.enable
     }) }
     ${ el.number({
@@ -27,12 +27,17 @@ export default () => {
       value: config.blueprints.buffer,
       min: 0, max: 1000000000, step: 10000000
     }) }
+    ${ el.toggle({
+      key: 'blueprints-pause',
+      name: 'Pause When Available',
+      value: config.blueprints.pause
+    }) }
   
     <div class="mt-1 pt-1 border-t"></div>
   
     ${ el.toggle({
       key: 'panning-enable',
-      name: 'Map Edge Scrolling',
+      name: 'MAP EDGE SCROLLING',
       value: config.panning.enable
     }) }
     ${ el.number({

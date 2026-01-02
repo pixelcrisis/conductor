@@ -36,4 +36,4 @@ export const number = data => {
 
 // reusable styles
 const _grid = 'flex items-center justify-between gap-2'
-const _label = 'text-xs font-bold uppercase text-muted-foreground select-none'
+const _label = 'text-xs font-bold text-muted-foreground select-none'

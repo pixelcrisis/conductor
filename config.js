@@ -11,6 +11,7 @@ const __red     = '#ff6319'
 export const blueprints = {
   enable: true,
   buffer: 100000000,
+  pause: false,
   colors: {
     nil: __gray,
     min: __yellow,

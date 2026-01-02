@@ -20,6 +20,7 @@
   var blueprints = {
     enable: true,
     buffer: 1e8,
+    pause: false,
     colors: {
       nil: __gray,
       min: __yellow,
@@ -237,7 +238,7 @@
   </div>`;
   };
   var _grid = "flex items-center justify-between gap-2";
-  var _label = "text-xs font-bold uppercase text-muted-foreground select-none";
+  var _label = "text-xs font-bold text-muted-foreground select-none";
 
   // views/settings.js
   var settings_default = () => {
@@ -245,7 +246,7 @@
     return `
   ${toggle({
       key: "demand-enable",
-      name: "Demand Tracker",
+      name: "DEMAND TRACKER",
       value: config.demand.enable
     })}
   
@@ -253,7 +254,7 @@
   
     ${toggle({
       key: "blueprints-enable",
-      name: "Blueprint Tracker",
+      name: "BLUEPRINT TRACKER",
       value: config.blueprints.enable
     })}
     ${number({
@@ -265,12 +266,17 @@
       max: 1e9,
       step: 1e7
     })}
+    ${toggle({
+      key: "blueprints-pause",
+      name: "Pause When Available",
+      value: config.blueprints.pause
+    })}
   
     <div class="mt-1 pt-1 border-t"></div>
   
     ${toggle({
       key: "panning-enable",
-      name: "Map Edge Scrolling",
+      name: "MAP EDGE SCROLLING",
       value: config.panning.enable
     })}
     ${number({
@@ -490,6 +496,7 @@
       else if (color != config.colors.max) {
         color = mod.__blueprints = config.colors.max;
         api.ui.showNotification("Blueprints Available!", "success");
+        if (config.pause) api.actions.setPause(true);
       }
       let elem = document.querySelectorAll(icon2);
       if (elem[0]) elem[0].style.color = color;

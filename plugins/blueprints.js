@@ -27,6 +27,7 @@ export default () => {
     else if (color != config.colors.max) {
       color = mod.__blueprints = config.colors.max
       api.ui.showNotification('Blueprints Available!', 'success')
+      if (config.pause) api.actions.setPause(true)
     }
 
     // apply the indicator color
