@@ -8,7 +8,7 @@ import * as el from './partials/base'
 export default () => {
   let config = window.Conductor.config
   return `
-  ${ el.toggle({
+    ${ el.toggle({
       key: 'demand-enable',
       name: 'DEMAND TRACKER',
       value: config.demand.enable

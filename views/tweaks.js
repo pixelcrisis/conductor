@@ -8,6 +8,14 @@ import * as el from './partials/base'
 export default () => {
   let config = window.Conductor.config
   return `
+    ${ el.toggle({
+      key: 'paused-warning',
+      name: 'Pause On Warnings',
+      value: config.paused.warning
+    }) }
+  
+    <div class="mt-1 pt-1 border-t"></div>
+
     ${ el.number({
       key: 'tweaks-STARTING_MONEY',
       name: 'Starting Money (Default $3b)',

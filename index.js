@@ -26,6 +26,7 @@ import $handlePanning from './plugins/panning'
 
   api.hooks.onGameInit(() => {
     mod.$addUI() // embed on game page
+    mod.$startWatch() // custom events
     if (mod.loop) clearInterval(mod.loop)
     // define our game loop
     mod.loop = setInterval(() => {
@@ -41,6 +42,7 @@ import $handlePanning from './plugins/panning'
 
   // clean up game time loops
   api.hooks.onGameEnd(() => {
+    mod.$endWatch()
     if (mod.loop) clearInterval(mod.loop)
   })
 })()

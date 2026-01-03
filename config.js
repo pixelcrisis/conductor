@@ -43,6 +43,12 @@ export const panning = {
   delay: 500
 }
 
+// Various Pausing
+export const paused = {
+  warning: true,
+  error: true
+}
+
 // Game Tweaks
 export const tweaks = {
   STARTING_MONEY: 3000000000,

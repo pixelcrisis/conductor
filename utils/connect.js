@@ -7,6 +7,7 @@
 // grab database for injection
 import * as $db from './storage'
 import * as $ui from './addmenu'
+import * as $ev from './watcher'
 
 export default (api, config) => {
   // make sure we're actually connected
@@ -23,5 +24,5 @@ export default (api, config) => {
   api.modifyConstants(config.tweaks)
 
   // return our mod
-  return { ...$db, ...$ui, config }
+  return { ...$db, ...$ui, ...$ev, config }
 }

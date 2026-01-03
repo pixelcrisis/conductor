@@ -11,6 +11,7 @@
     blueprints: () => blueprints,
     demand: () => demand,
     panning: () => panning,
+    paused: () => paused,
     tweaks: () => tweaks
   });
   var __gray = "#a3a3a3";
@@ -46,6 +47,10 @@
     area: 50,
     distance: 100,
     delay: 500
+  };
+  var paused = {
+    warning: true,
+    error: true
   };
   var tweaks = {
     STARTING_MONEY: 3e9,
@@ -244,7 +249,7 @@
   var settings_default = () => {
     let config = window.Conductor.config;
     return `
-  ${toggle({
+    ${toggle({
       key: "demand-enable",
       name: "DEMAND TRACKER",
       value: config.demand.enable
@@ -309,6 +314,14 @@
   var tweaks_default = () => {
     let config = window.Conductor.config;
     return `
+    ${toggle({
+      key: "paused-warning",
+      name: "Pause On Warnings",
+      value: config.paused.warning
+    })}
+  
+    <div class="mt-1 pt-1 border-t"></div>
+
     ${number({
       key: "tweaks-STARTING_MONEY",
       name: "Starting Money (Default $3b)",
@@ -430,6 +443,33 @@
     document.querySelector(id + "Btn").setAttribute("style", bor);
   };
 
+  // utils/watcher.js
+  var watcher_exports = {};
+  __export(watcher_exports, {
+    $endWatch: () => $endWatch,
+    $startWatch: () => $startWatch
+  });
+  var $startWatch = () => {
+    console.log(">> Conductor: Loading Events...");
+    window.Conductor.__warnings = watchWarnings();
+  };
+  var $endWatch = () => {
+    window.Conductor.__warnings.disconnect();
+    delete window.Conductor.__warnings;
+  };
+  var watchWarnings = () => {
+    let sel = "main > .absolute.bottom-0 .h-full .h-full .ml-auto .flex-col .flex-col";
+    let elem = document.querySelector(sel);
+    let watch = new MutationObserver((changes) => {
+      if (changes[0].target?.innerText != "Warnings") return;
+      let cfg = window.Conductor.config.paused.warning;
+      if (cfg) window.SubwayBuilderAPI.actions.setPause(true);
+    });
+    watch.observe(elem, { childList: true });
+    console.log(">> Conductor: Warning Event Active");
+    return watch;
+  };
+
   // utils/connect.js
   var connect_default = (api, config) => {
     console.log(">> Conductor: Checking or API...");
@@ -439,7 +479,7 @@
     if (data) $migrate(config, data);
     console.log(">> Conductor: Tweaking Settings...");
     api.modifyConstants(config.tweaks);
-    return { ...storage_exports, ...addmenu_exports, config };
+    return { ...storage_exports, ...addmenu_exports, ...watcher_exports, config };
   };
 
   // plugins/demand.js
@@ -543,6 +583,7 @@
     mod.$addUI();
     api.hooks.onGameInit(() => {
       mod.$addUI();
+      mod.$startWatch();
       if (mod.loop) clearInterval(mod.loop);
       mod.loop = setInterval(() => {
         demand_default();
@@ -553,6 +594,7 @@
       panning_default(map);
     });
     api.hooks.onGameEnd(() => {
+      mod.$endWatch();
       if (mod.loop) clearInterval(mod.loop);
     });
   })();
