@@ -315,6 +315,11 @@
     let config = window.Conductor.config;
     return `
     ${toggle({
+      key: "paused-error",
+      name: "Pause On Errors",
+      value: config.paused.error
+    })}
+    ${toggle({
       key: "paused-warning",
       name: "Pause On Warnings",
       value: config.paused.warning
@@ -451,10 +456,13 @@
   });
   var $startWatch = () => {
     console.log(">> Conductor: Loading Events...");
+    window.Conductor.__errors = watchErrors();
     window.Conductor.__warnings = watchWarnings();
   };
   var $endWatch = () => {
+    window.Conductor.__errors.disconnect();
     window.Conductor.__warnings.disconnect();
+    delete window.Conductor.__errors;
     delete window.Conductor.__warnings;
   };
   var watchWarnings = () => {
@@ -467,6 +475,18 @@
     });
     watch.observe(elem, { childList: true });
     console.log(">> Conductor: Warning Event Active");
+    return watch;
+  };
+  var watchErrors = () => {
+    let sel = 'main > div[role="region"] ol';
+    let elem = document.querySelector(sel);
+    let watch = new MutationObserver((changes) => {
+      if (changes[0].target?.innerText.indexOf("remove") < 0) return;
+      let cfg = window.Conductor.config.paused.error;
+      if (cfg) window.SubwayBuilderAPI.actions.setPause(true);
+    });
+    watch.observe(elem, { childList: true });
+    console.log(">> Conductor: Error Event Active");
     return watch;
   };
 

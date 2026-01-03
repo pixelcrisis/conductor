@@ -9,6 +9,11 @@ export default () => {
   let config = window.Conductor.config
   return `
     ${ el.toggle({
+      key: 'paused-error',
+      name: 'Pause On Errors',
+      value: config.paused.error
+    }) }
+    ${ el.toggle({
       key: 'paused-warning',
       name: 'Pause On Warnings',
       value: config.paused.warning

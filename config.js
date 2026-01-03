@@ -45,8 +45,8 @@ export const panning = {
 
 // Various Pausing
 export const paused = {
-  warning: true,
-  error: true
+  warning: false,
+  error: false
 }
 
 // Game Tweaks
