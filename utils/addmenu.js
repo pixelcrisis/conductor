@@ -26,13 +26,7 @@ export const $addUI = () => {
 
 export const $showUI = () => {
   let menu = document.querySelector('#conductMenu')
-  let icon = document.querySelector('#conductGame')
-  if (!icon) icon = document.querySelector('#conductMain')
-  // toggle the menu
   if (menu) menu.classList.toggle('hidden')
-  // update our icon to reflect state
-  let show = menu.classList.contains('hidden') ? 0 : 1
-  icon.setAttribute('style', `filter: invert(${ show })`)
 }
 
 export const $showTab = id => {

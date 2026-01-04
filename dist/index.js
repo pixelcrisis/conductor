@@ -49,8 +49,8 @@
     delay: 500
   };
   var paused = {
-    warning: true,
-    error: true
+    warning: false,
+    error: false
   };
   var tweaks = {
     STARTING_MONEY: 3e9,
@@ -402,7 +402,7 @@
   var gameTop = 'div[data-mod-id="top-bar"]:first-child .ml-auto';
   var main = () => {
     return `<button id="conductMain" onclick="window.Conductor.$showUI()"
-    class="inline-flex items-center justify-center gap-2 mr-1 whitespace-nowrap rounded-md hover:bg-secondary size-10 bg-background/95" type="button">
+    class="inline-flex items-center justify-center gap-2 mr-1 whitespace-nowrap rounded-md hover:bg-secondary size-10" type="button">
     ${icon("1.3rem")}
   </button>`;
   };
@@ -433,11 +433,7 @@
   };
   var $showUI = () => {
     let menu = document.querySelector("#conductMenu");
-    let icon2 = document.querySelector("#conductGame");
-    if (!icon2) icon2 = document.querySelector("#conductMain");
     if (menu) menu.classList.toggle("hidden");
-    let show = menu.classList.contains("hidden") ? 0 : 1;
-    icon2.setAttribute("style", `filter: invert(${show})`);
   };
   var $showTab = (id) => {
     let cur = document.querySelector(".c-tab:not(.hidden)");

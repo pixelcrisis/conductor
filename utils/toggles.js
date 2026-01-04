@@ -10,7 +10,7 @@ export const gameTop = 'div[data-mod-id="top-bar"]:first-child .ml-auto'
 // icon for main menu
 export const main = () => {
   return `<button id="conductMain" onclick="window.Conductor.$showUI()"
-    class="inline-flex items-center justify-center gap-2 mr-1 whitespace-nowrap rounded-md hover:bg-secondary size-10 bg-background/95" type="button">
+    class="inline-flex items-center justify-center gap-2 mr-1 whitespace-nowrap rounded-md hover:bg-secondary size-10" type="button">
     ${ icon('1.3rem') }
   </button>`
 }
