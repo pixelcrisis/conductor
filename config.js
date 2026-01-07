@@ -43,6 +43,14 @@ export const panning = {
   delay: 500
 }
 
+// Dynamic Tickets
+export const tickets = {
+  enable: false,
+  low: 3.00,
+  medium: 3.00,
+  high: 3.00
+}
+
 // Various Pausing
 export const paused = {
   warning: false,

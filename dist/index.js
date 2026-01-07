@@ -12,6 +12,7 @@
     demand: () => demand,
     panning: () => panning,
     paused: () => paused,
+    tickets: () => tickets,
     tweaks: () => tweaks
   });
   var __gray = "#a3a3a3";
@@ -47,6 +48,12 @@
     area: 50,
     distance: 100,
     delay: 500
+  };
+  var tickets = {
+    enable: false,
+    low: 3,
+    medium: 3,
+    high: 3
   };
   var paused = {
     warning: false,
@@ -138,6 +145,7 @@
   var addmenu_exports = {};
   __export(addmenu_exports, {
     $addUI: () => $addUI,
+    $getNum: () => $getNum,
     $showTab: () => $showTab,
     $showUI: () => $showUI
   });
@@ -180,7 +188,7 @@
   };
 
   // views/partials/tabs.js
-  var tabs_default = (tabA, tabB) => {
+  var tabs_default = (tabA, tabB, tabC) => {
     const style = "border-bottom: 1px solid hsl(var(--foreground))";
     return `
     <div class="flex gap-1">
@@ -195,6 +203,12 @@
         class="c-tab-btn inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium border w-full pl-3 pr-2 py-2 bg-primary-foreground h-8 text-xs">
         ${tabB.name}
       </button>
+      
+      <button id="${tabC.id}Btn"
+        onclick="window.Conductor.$showTab('#${tabC.id}')" 
+        class="c-tab-btn inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium border w-full pl-3 pr-2 py-2 bg-primary-foreground h-8 text-xs">
+        ${tabC.name}
+      </button>
     </div>
 
     <div class="border-t"></div>
@@ -207,6 +221,11 @@
     <div id="${tabB.id}" class="c-tab flex flex-col gap-4 hidden">
       <div class="flex flex-col gap-2 w-full px-1">
         ${tabB.body()}
+      </div>
+    </div>
+    <div id="${tabC.id}" class="c-tab flex flex-col gap-4 hidden">
+      <div class="flex flex-col gap-2 w-full px-1">
+        ${tabC.body()}
       </div>
     </div>
   `;
@@ -234,19 +253,28 @@
     <input type="range" 
       value="${data.value}"
       min="${data.min}" max="${data.max}" step="${data.step}"
-      onchange="window.Conductor.$update('${data.key}', parseInt(this.value))"
-      oninput="this.nextElementSibling.value = '${str}' + parseInt(this.value).toLocaleString()"
+      onchange="window.Conductor.$update('${data.key}', 
+                  window.Conductor.$getNum(this.value, ${data.float}))"
+      oninput="this.nextElementSibling.value = '${str}' + 
+        window.Conductor.$getNum(this.value, ${data.float}).toLocaleString()"
       class="rounded-md border border-input px-3 py-2 bg-background text-right text-xs" />
     <output class="text-xs font-bold text-muted-foreground">
-      ${str}${data.value.toLocaleString()}
+      ${str}${window.Conductor.$getNum(data.value, data.float).toLocaleString()}
     </output>
   </div>`;
+  };
+  var button = (data) => {
+    return `
+    <button onclick="${data.func}" 
+      class="c-tab-btn inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium border w-full pl-3 pr-2 py-2 bg-primary-foreground h-8 text-xs">
+      ${data.text}
+    </button>`;
   };
   var _grid = "flex items-center justify-between gap-2";
   var _label = "text-xs font-bold text-muted-foreground select-none";
 
-  // views/settings.js
-  var settings_default = () => {
+  // views/options.js
+  var options_default = () => {
     let config = window.Conductor.config;
     return `
     ${toggle({
@@ -326,16 +354,7 @@
     })}
   
     <div class="mt-1 pt-1 border-t"></div>
-
-    ${number({
-      key: "tweaks-STARTING_MONEY",
-      name: "Starting Money (Default $3b)",
-      value: config.tweaks.STARTING_MONEY,
-      cash: true,
-      min: 1e9,
-      max: 1e10,
-      step: 5e8
-    })}
+    
     ${number({
       key: "tweaks-STARTING_TRAIN_CARS",
       name: "Starting Train Cars (Default 30)",
@@ -343,15 +362,6 @@
       min: 0,
       max: 100,
       step: 5
-    })}
-    ${number({
-      key: "tweaks-DEFAULT_TICKET_COST",
-      name: "Default Ticket Cost (Default $3)",
-      value: config.tweaks.DEFAULT_TICKET_COST,
-      min: 0.5,
-      max: 10,
-      step: 0.5,
-      cash: true
     })}
   
     <div class="mt-1 pt-1 border-t"></div>
@@ -383,13 +393,90 @@
   `;
   };
 
+  // views/costs.js
+  var costs_default = () => {
+    let config = window.Conductor.config;
+    return `
+    ${number({
+      key: "tweaks-STARTING_MONEY",
+      name: "Starting Money (Default $3b)",
+      value: config.tweaks.STARTING_MONEY,
+      cash: true,
+      min: 1e9,
+      max: 1e10,
+      step: 5e8
+    })}
+    ${number({
+      key: "tweaks-DEFAULT_TICKET_COST",
+      name: "Starting Ticket Cost (Default $3)",
+      value: config.tweaks.DEFAULT_TICKET_COST,
+      min: 0.5,
+      max: 10,
+      step: 0.5,
+      cash: true
+    })}
+  
+    <div class="mt-1 pt-1 border-t"></div>
+
+    ${toggle({
+      key: "tickets-enable",
+      name: "DYNAMIC TICKET PRICING",
+      value: config.tickets.enable
+    })}
+    ${number({
+      key: "tickets-low",
+      name: "Low Demand Price",
+      value: config.tickets.low,
+      cash: true,
+      float: true,
+      min: 0.25,
+      max: 10,
+      step: 0.25
+    })}
+    ${number({
+      key: "tickets-medium",
+      name: "Medium Demand Price",
+      value: config.tickets.medium,
+      cash: true,
+      float: true,
+      min: 0.25,
+      max: 10,
+      step: 0.25
+    })}
+    ${number({
+      key: "tickets-high",
+      name: "High Demand Price",
+      value: config.tickets.high,
+      cash: true,
+      float: true,
+      min: 0.25,
+      max: 10,
+      step: 0.25
+    })}
+    
+    <div class="mt-1 pt-1 border-t"></div>
+
+    <div class="flex gap-1">
+      ${button({
+      text: "Add $100m",
+      func: "window.SubwayBuilderAPI.actions.addMoney(100000000)"
+    })}
+      ${button({
+      text: "Add $500m",
+      func: "window.SubwayBuilderAPI.actions.addMoney(500000000)"
+    })}
+    </div>
+  `;
+  };
+
   // views/panel.js
   var panel_default = () => {
     const style = "top: 65px; right: 16px; width: 322px;";
     const head = `Subway Conductor v${package_default.version}`;
-    const tabA = { id: "cOptions", name: "Mod Options", body: settings_default };
-    const tabB = { id: "cTweaks", name: "Game Tweaks", body: tweaks_default };
-    const body = tabs_default(tabA, tabB);
+    const tabA = { id: "cOptions", name: "Options", body: options_default };
+    const tabB = { id: "cTweaks", name: "Tweaks", body: tweaks_default };
+    const tabC = { id: "cCosts", name: "Costs", body: costs_default };
+    const body = tabs_default(tabA, tabB, tabC);
     return `
     <div id="conductMenu" class="hidden absolute z-20" style="${style}">
       ${card_default({ head, body })}
@@ -442,6 +529,10 @@
     let bor = "border-bottom: 1px solid hsl(var(--foreground))";
     document.querySelector(id).classList.toggle("hidden");
     document.querySelector(id + "Btn").setAttribute("style", bor);
+  };
+  var $getNum = (amt, float) => {
+    if (!float) return parseInt(amt);
+    return parseFloat(amt).toFixed(2);
   };
 
   // utils/watcher.js
@@ -590,6 +681,33 @@
     });
   };
 
+  // plugins/tickets.js
+  var tickets_default = () => {
+    let mod = window.Conductor;
+    let config = mod.config.tickets;
+    const api = window.SubwayBuilderAPI;
+    if (config.enable) {
+      let curr = 0;
+      let hour = api.gameState.getCurrentHour();
+      if (hour < 5) curr = 0;
+      else if (hour < 6) curr = 1;
+      else if (hour < 9) curr = 2;
+      else if (hour < 16) curr = 1;
+      else if (hour < 19) curr = 2;
+      else if (hour < 20) curr = 1;
+      else curr = 0;
+      if (curr == mod.__ticket) return;
+      else mod.__ticket = curr;
+      let data = parseFloat(config.low);
+      if (curr == 1) data = parseFloat(config.medium);
+      if (curr == 2) data = parseFloat(config.high);
+      console.log(data, typeof data);
+      api.actions.setTicketPrice(data);
+      api.ui.showNotification("Set Ticket Price To: $" + parseFloat(data).toFixed(2));
+      console.log(">> Conductor: Set Ticket Price To: $" + parseFloat(data).toFixed(2));
+    }
+  };
+
   // index.js
   (function() {
     const api = window.SubwayBuilderAPI;
@@ -604,6 +722,7 @@
       mod.loop = setInterval(() => {
         demand_default();
         blueprints_default();
+        tickets_default();
       }, 1e3);
     });
     api.hooks.onMapReady((map) => {

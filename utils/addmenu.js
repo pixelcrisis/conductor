@@ -41,3 +41,8 @@ export const $showTab = id => {
   document.querySelector(id).classList.toggle('hidden')
   document.querySelector(id + 'Btn').setAttribute('style', bor)
 }
+
+export const $getNum = (amt, float) => {
+  if (!float) return parseInt(amt)
+  return parseFloat(amt).toFixed(2)
+}

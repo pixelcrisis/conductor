@@ -8,8 +8,9 @@ import mod from '../package.json'
 import card from './partials/card'
 import tabs from './partials/tabs'
 
-import settings from './settings'
+import options from './options'
 import tweaks from './tweaks'
+import costs from './costs'
 
 export default () => {
   // positioning / styling of our box
@@ -17,10 +18,11 @@ export default () => {
 
   const head = `Subway Conductor v${ mod.version }`
 
-  const tabA = { id: 'cOptions', name: 'Mod Options', body: settings }
-  const tabB = { id: 'cTweaks',  name: 'Game Tweaks', body: tweaks }
+  const tabA = { id: 'cOptions', name: 'Options', body: options }
+  const tabB = { id: 'cTweaks',  name: 'Tweaks', body: tweaks }
+  const tabC = { id: 'cCosts',  name: 'Costs', body: costs }
 
-  const body = tabs(tabA, tabB)
+  const body = tabs(tabA, tabB, tabC)
 
   return `
     <div id="conductMenu" class="hidden absolute z-20" style="${ style }">

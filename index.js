@@ -13,6 +13,7 @@ import $connect from './utils/connect'
 import $trackDemand from './plugins/demand'
 import $trackBlueprints from './plugins/blueprints'
 import $handlePanning from './plugins/panning'
+import $ticketPricing from './plugins/tickets'
 
 // let's go
 (function(){
@@ -33,6 +34,7 @@ import $handlePanning from './plugins/panning'
       // looping plugins
       $trackDemand()
       $trackBlueprints()
+      $ticketPricing()
     }, 1000)
   })
 

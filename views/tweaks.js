@@ -20,24 +20,12 @@ export default () => {
     }) }
   
     <div class="mt-1 pt-1 border-t"></div>
-
-    ${ el.number({
-      key: 'tweaks-STARTING_MONEY',
-      name: 'Starting Money (Default $3b)',
-      value: config.tweaks.STARTING_MONEY, cash: true,
-      min: 1000000000, max: 10000000000, step: 500000000
-    }) }
+    
     ${ el.number({
       key: 'tweaks-STARTING_TRAIN_CARS',
       name: 'Starting Train Cars (Default 30)',
       value: config.tweaks.STARTING_TRAIN_CARS,
       min: 0, max: 100, step: 5
-    }) }
-    ${ el.number({
-      key: 'tweaks-DEFAULT_TICKET_COST',
-      name: 'Default Ticket Cost (Default $3)',
-      value: config.tweaks.DEFAULT_TICKET_COST,
-      min: 0.5, max: 10, step: 0.5, cash: true
     }) }
   
     <div class="mt-1 pt-1 border-t"></div>
