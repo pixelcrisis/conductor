@@ -78,7 +78,7 @@
   };
 
   // package.json
-  var version = "0.5.0";
+  var version = "0.8.0";
   var package_default = {
     name: "conductor",
     version,
@@ -701,10 +701,10 @@
       let data = parseFloat(config.low);
       if (curr == 1) data = parseFloat(config.medium);
       if (curr == 2) data = parseFloat(config.high);
-      console.log(data, typeof data);
       api.actions.setTicketPrice(data);
-      api.ui.showNotification("Set Ticket Price To: $" + parseFloat(data).toFixed(2));
-      console.log(">> Conductor: Set Ticket Price To: $" + parseFloat(data).toFixed(2));
+      data = parseFloat(data).toFixed(2);
+      api.ui.showNotification("Set Ticket Price To: $" + data);
+      console.log(">> Conductor: Set Ticket Price To: $" + data);
     }
   };
 
