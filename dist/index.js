@@ -9,7 +9,9 @@
   var config_exports = {};
   __export(config_exports, {
     blueprints: () => blueprints,
+    costs: () => costs,
     demand: () => demand,
+    game: () => game,
     panning: () => panning,
     paused: () => paused,
     tickets: () => tickets,
@@ -55,6 +57,9 @@
     medium: 3,
     high: 3
   };
+  var game = {
+    speed: 1
+  };
   var paused = {
     warning: false,
     error: false
@@ -73,6 +78,17 @@
         CUT_AND_COVER: -10,
         AT_GRADE: -3,
         ELEVATED: 4.5
+      }
+    }
+  };
+  var costs = {
+    CONSTRUCTION_COSTS: {
+      ELEVATION_MULTIPLIERS: {
+        DEEP_BORE: 4.5,
+        STANDARD_TUNNEL: 2,
+        CUT_AND_COVER: 1,
+        AT_GRADE: 0.3,
+        ELEVATED: 0.8
       }
     }
   };
@@ -126,7 +142,9 @@
     if (!nested) config[target[0]][target[1]] = val;
     else config[target[0]][target[1]][target[2]] = val;
     let result = !nested ? val : { [target[2]]: val };
-    if (target[0] == "tweaks") api.modifyConstants({ [target[1]]: result });
+    if (target[0] == "tweaks" || target[0] == "costs") {
+      api.modifyConstants({ [target[1]]: result });
+    }
     console.log(">> Conductor: Set " + target.join(".") + " to " + val);
     window.Conductor.$save(config);
   };
@@ -153,7 +171,7 @@
   // views/partials/card.js
   var card_default = (data) => {
     return `
-    <div class="pointer-events-auto backdrop-blur-sm border border-border/50 h-fit rounded-lg text-sm items-center justify-center shadow-lg overflow-hidden bg-transparent w-full max-h-full flex flex-col">
+    <div class="pointer-events-auto backdrop-blur-md border border-border/50 h-fit rounded-lg text-sm items-center justify-center shadow-lg overflow-hidden bg-transparent w-full max-h-full flex flex-col">
       <div class="flex h-9 min-h-9 w-full p-1 border-b border-primary/15 items-center justify-between bg-primary-foreground">
         <div class="flex items-center h-full w-full"></div>
         <div class="flex items-center h-full w-full">
@@ -214,17 +232,17 @@
     <div class="border-t"></div>
 
     <div id="${tabA.id}" class="c-tab flex flex-col gap-4">
-      <div class="flex flex-col gap-2 w-full px-1">
+      <div class="flex gap-3">
         ${tabA.body()}
       </div>
     </div>
     <div id="${tabB.id}" class="c-tab flex flex-col gap-4 hidden">
-      <div class="flex flex-col gap-2 w-full px-1">
+      <div class="flex gap-3">
         ${tabB.body()}
       </div>
     </div>
     <div id="${tabC.id}" class="c-tab flex flex-col gap-4 hidden">
-      <div class="flex flex-col gap-2 w-full px-1">
+      <div class="flex gap-3">
         ${tabC.body()}
       </div>
     </div>
@@ -243,25 +261,28 @@
         ${data.value ? "Enabled" : "Disabled"}
       </span>
       <input type="checkbox" class="sr-only" checked="${data.value}" />
-    </div>`;
+    </div>
+    ${data.desc ? text(data.desc) : ""}`;
   };
   var number = (data) => {
     const str = data.cash ? "$" : "";
     return `
-  <span class="${_label} pt-1">${data.name}</span>
-  <div class="${_grid}" style="margin-top: -0.75rem">
-    <input type="range" 
-      value="${data.value}"
-      min="${data.min}" max="${data.max}" step="${data.step}"
-      onchange="window.Conductor.$update('${data.key}', 
-                  window.Conductor.$getNum(this.value, ${data.float}))"
-      oninput="this.nextElementSibling.value = '${str}' + 
-        window.Conductor.$getNum(this.value, ${data.float}).toLocaleString()"
-      class="rounded-md border border-input px-3 py-2 bg-background text-right text-xs" />
-    <output class="text-xs font-bold text-muted-foreground">
-      ${str}${window.Conductor.$getNum(data.value, data.float).toLocaleString()}
-    </output>
-  </div>`;
+    ${label(data.name, "pt-2")}
+    <div class="${_grid}" style="${_scoot}">
+      <input type="range" 
+        value="${data.value}"
+        min="${data.min}" max="${data.max}" step="${data.step}"
+        onchange="window.Conductor.$update('${data.key}', 
+                    window.Conductor.$getNum(this.value, ${data.float}));
+                  ${data.func ? data.func : ""}"
+        oninput="this.nextElementSibling.value = '${str}' + 
+          window.Conductor.$getNum(this.value, ${data.float}).toLocaleString()"
+        class="rounded-md border border-input px-3 py-2 bg-background text-right text-xs" />
+      <output class="text-xs font-bold text-muted-foreground">
+        ${str}${window.Conductor.$getNum(data.value, data.float).toLocaleString()}
+      </output>
+    </div>
+    ${data.desc ? text(data.desc, true) : ""}`;
   };
   var button = (data) => {
     return `
@@ -270,160 +291,209 @@
       ${data.text}
     </button>`;
   };
+  var label = (str, cl) => {
+    return `<span class="${_label} ${cl ? cl : ""}">${str}</span>`;
+  };
   var _grid = "flex items-center justify-between gap-2";
   var _label = "text-xs font-bold text-muted-foreground select-none";
+  var _scoot = "margin-top: -0.75rem";
+  var text = (str, pad) => `
+  <span class="text-xs text-muted-foreground" style="${pad ? _scoot : ""}">
+    ${str}
+  </span>
+`;
 
   // views/options.js
   var options_default = () => {
     let config = window.Conductor.config;
     return `
-    ${toggle({
-      key: "demand-enable",
-      name: "DEMAND TRACKER",
-      value: config.demand.enable
+    <div class="flex flex-col gap-2 px-1" style="width: 275px">
+      ${toggle({
+      key: "paused-warning",
+      name: "Pause For Warnings",
+      value: config.paused.warning,
+      desc: "Automatically pauses the game for any detected train capacity warnings."
     })}
-  
-    <div class="mt-1 pt-1 border-t"></div>
-  
-    ${toggle({
+      ${toggle({
+      key: "paused-error",
+      name: "Pause For Errors",
+      value: config.paused.error,
+      desc: "Automatically pauses the game for any detected train removal errors."
+    })}
+    
+      <div class="mt-1 pt-1 border-t"></div>
+    
+      ${toggle({
       key: "blueprints-enable",
       name: "BLUEPRINT TRACKER",
-      value: config.blueprints.enable
+      value: config.blueprints.enable,
+      desc: "Tracks blueprint cost vs funds and adds color to the cash icon to indicate blueprint availability."
     })}
-    ${number({
+      ${toggle({
+      key: "blueprints-pause",
+      name: "Pause When Available",
+      value: config.blueprints.pause,
+      desc: "Automatically pauses the game when blueprints + buffer become available."
+    })}
+      ${number({
       key: "blueprints-buffer",
       name: "Train Buffer",
       cash: true,
       value: config.blueprints.buffer,
       min: 0,
       max: 1e9,
-      step: 1e7
+      step: 1e7,
+      desc: "A yellow icon means you can afford the blueprints but not your train buffer. Used to ensure you can add trains to any new lines."
     })}
-    ${toggle({
-      key: "blueprints-pause",
-      name: "Pause When Available",
-      value: config.blueprints.pause
+    </div>
+
+    <div class="flex flex-col gap-2 px-1" style="width: 275px">
+      ${toggle({
+      key: "demand-enable",
+      name: "DEMAND TRACKER",
+      value: config.demand.enable,
+      desc: "Tracks the current demand level and adds color to the demand icon for ease of demand identification."
     })}
-  
-    <div class="mt-1 pt-1 border-t"></div>
-  
-    ${toggle({
+    
+      <div class="mt-1 pt-1 border-t"></div>
+
+      ${toggle({
       key: "panning-enable",
       name: "MAP EDGE SCROLLING",
-      value: config.panning.enable
+      value: config.panning.enable,
+      desc: "Automatically pan the map when the cursor is near the map edge."
     })}
-    ${number({
+      ${number({
       key: "panning-area",
       name: "Edge Width (px)",
       value: config.panning.area,
       min: 0,
       max: 150,
-      step: 5
+      step: 5,
+      desc: "The size of the panning detection area: how close to the edge before panning begins."
     })}
-    ${number({
+      ${number({
       key: "panning-distance",
       name: "Panning Distance (px)",
       value: config.panning.distance,
       min: 0,
       max: 1e3,
-      step: 10
+      step: 10,
+      desc: "How far the map pans per eachdelay."
     })}
-    ${number({
+      ${number({
       key: "panning-delay",
       name: "Panning Delay (ms)",
       value: config.panning.delay,
       min: 0,
       max: 2e3,
-      step: 100
-    })}`;
+      step: 100,
+      desc: "The delay between each map pan."
+    })}
+    </div>`;
   };
 
   // views/tweaks.js
   var tweaks_default = () => {
     let config = window.Conductor.config;
     return `
-    ${toggle({
-      key: "paused-error",
-      name: "Pause On Errors",
-      value: config.paused.error
+    <div class="flex flex-col gap-2 px-1" style="width: 275px">
+      ${number({
+      key: "game-speed",
+      name: "Game Speed Multiplier",
+      value: config.game.speed,
+      min: 1,
+      max: 10,
+      step: 1,
+      func: "window.Conductor.$setSpeed()",
+      desc: "Increase the speed of all in-game toggles."
     })}
-    ${toggle({
-      key: "paused-warning",
-      name: "Pause On Warnings",
-      value: config.paused.warning
-    })}
-  
-    <div class="mt-1 pt-1 border-t"></div>
     
-    ${number({
-      key: "tweaks-STARTING_TRAIN_CARS",
-      name: "Starting Train Cars (Default 30)",
-      value: config.tweaks.STARTING_TRAIN_CARS,
-      min: 0,
-      max: 100,
-      step: 5
-    })}
-  
-    <div class="mt-1 pt-1 border-t"></div>
-  
-    ${number({
+      <div class="mt-1 pt-1 border-t"></div>
+      
+      ${number({
       key: "tweaks-MIN_TRACK_LENGTH",
       name: "Min Track Length (Default 10)",
       value: config.tweaks.MIN_TRACK_LENGTH,
       min: 0,
       max: 50,
-      step: 1
+      step: 1,
+      desc: "Change how long a valid track can be."
     })}
-    ${number({
+      ${number({
       key: "tweaks-MIN_TURN_RADIUS",
       name: "Min Turn Radius (Default 29)",
       value: config.tweaks.MIN_TURN_RADIUS,
       min: 0,
       max: 50,
-      step: 1
+      step: 1,
+      desc: "Controls the turn sharpness of tracks."
     })}
-    ${number({
+      ${number({
       key: "tweaks-MAX_SLOPE_PERCENTAGE",
       name: "Max Slope % (Default 4)",
       value: config.tweaks.MAX_SLOPE_PERCENTAGE,
       min: 0,
-      max: 10,
-      step: 1
+      max: 50,
+      step: 1,
+      desc: "Changes how steep your tracks can run."
     })}
-  `;
+    </div>
+  
+    <div class="flex flex-col gap-2 px-1" style="width: 275px">
+      ${label("ELEVATION TWEAKS")}
+      
+      ${number({
+      key: "tweaks-CONSTRUCTION_COSTS-ELEVATION_THRESHOLDS-ELEVATED",
+      name: "Elevated Tracks Start At: (Default 4.5)",
+      value: config.tweaks.CONSTRUCTION_COSTS.ELEVATION_THRESHOLDS.ELEVATED,
+      min: -40,
+      max: 10,
+      step: 1,
+      desc: "Anything below becomes At Grade."
+    })}
+      ${number({
+      key: "tweaks-CONSTRUCTION_COSTS-ELEVATION_THRESHOLDS-AT_GRADE",
+      name: "At Grade Tracks Start At: (Default -3)",
+      value: config.tweaks.CONSTRUCTION_COSTS.ELEVATION_THRESHOLDS.AT_GRADE,
+      min: -40,
+      max: 10,
+      step: 1,
+      desc: "Anything below becomes Cut and Cover."
+    })}
+      ${number({
+      key: "tweaks-CONSTRUCTION_COSTS-ELEVATION_THRESHOLDS-CUT_AND_COVER",
+      name: "Cut/Cover Starts At: (Default -10)",
+      value: config.tweaks.CONSTRUCTION_COSTS.ELEVATION_THRESHOLDS.CUT_AND_COVER,
+      min: -50,
+      max: 0,
+      step: 1,
+      desc: "Anything below becomes a Standard Tunnel."
+    })}
+      ${number({
+      key: "tweaks-CONSTRUCTION_COSTS-ELEVATION_THRESHOLDS-STANDARD_TUNNEL",
+      name: "Standard Tunnels Start At: (Default -24)",
+      value: config.tweaks.CONSTRUCTION_COSTS.ELEVATION_THRESHOLDS.STANDARD_TUNNEL,
+      min: -70,
+      max: -20,
+      step: 1,
+      desc: "Anything below becomes a Deep Bore."
+    })}
+    </div>`;
   };
 
   // views/costs.js
   var costs_default = () => {
     let config = window.Conductor.config;
     return `
-    ${number({
-      key: "tweaks-STARTING_MONEY",
-      name: "Starting Money (Default $3b)",
-      value: config.tweaks.STARTING_MONEY,
-      cash: true,
-      min: 1e9,
-      max: 1e10,
-      step: 5e8
-    })}
-    ${number({
-      key: "tweaks-DEFAULT_TICKET_COST",
-      name: "Starting Ticket Cost (Default $3)",
-      value: config.tweaks.DEFAULT_TICKET_COST,
-      min: 0.5,
-      max: 10,
-      step: 0.5,
-      cash: true
-    })}
-  
-    <div class="mt-1 pt-1 border-t"></div>
-
-    ${toggle({
+    <div class="flex flex-col gap-2 px-1" style="width: 275px">
+      ${toggle({
       key: "tickets-enable",
       name: "DYNAMIC TICKET PRICING",
-      value: config.tickets.enable
+      value: config.tickets.enable,
+      desc: "Automatically change the ticket price based on the current demand level. (May require manually setting ticket price after disable.)"
     })}
-    ${number({
+      ${number({
       key: "tickets-low",
       name: "Low Demand Price",
       value: config.tickets.low,
@@ -433,7 +503,7 @@
       max: 10,
       step: 0.25
     })}
-    ${number({
+      ${number({
       key: "tickets-medium",
       name: "Medium Demand Price",
       value: config.tickets.medium,
@@ -443,7 +513,7 @@
       max: 10,
       step: 0.25
     })}
-    ${number({
+      ${number({
       key: "tickets-high",
       name: "High Demand Price",
       value: config.tickets.high,
@@ -453,29 +523,80 @@
       max: 10,
       step: 0.25
     })}
-    
-    <div class="mt-1 pt-1 border-t"></div>
+      
+      <div class="mt-1 pt-1 border-t"></div>
 
-    <div class="flex gap-1">
-      ${button({
+      <div class="flex gap-1">
+        ${button({
       text: "Add $100m",
       func: "window.SubwayBuilderAPI.actions.addMoney(100000000)"
     })}
-      ${button({
+        ${button({
       text: "Add $500m",
       func: "window.SubwayBuilderAPI.actions.addMoney(500000000)"
     })}
+      </div>
     </div>
-  `;
+  
+    <div class="flex flex-col gap-2 px-1" style="width: 275px">
+      ${label("COST MULTIPLIERS")}
+      
+            
+      ${number({
+      key: "costs-CONSTRUCTION_COSTS-ELEVATION_MULTIPLIERS-ELEVATED",
+      name: "Elevated Tracks: (Default: 0.8)",
+      value: config.costs.CONSTRUCTION_COSTS.ELEVATION_MULTIPLIERS.ELEVATED,
+      min: 0.2,
+      max: 10,
+      step: 0.2,
+      float: true
+    })}
+      ${number({
+      key: "costs-CONSTRUCTION_COSTS-ELEVATION_MULTIPLIERS-AT_GRADE",
+      name: "At Grade Tracks: (Default: 0.3)",
+      value: config.costs.CONSTRUCTION_COSTS.ELEVATION_MULTIPLIERS.AT_GRADE,
+      min: 0.2,
+      max: 10,
+      step: 0.2,
+      float: true
+    })}
+      ${number({
+      key: "costs-CONSTRUCTION_COSTS-ELEVATION_MULTIPLIERS-CUT_AND_COVER",
+      name: "Cut/Cover Tracks: (Default: 1)",
+      value: config.costs.CONSTRUCTION_COSTS.ELEVATION_MULTIPLIERS.CUT_AND_COVER,
+      min: 0.2,
+      max: 10,
+      step: 0.2,
+      float: true
+    })}
+      ${number({
+      key: "costs-CONSTRUCTION_COSTS-ELEVATION_MULTIPLIERS-STANDARD_TUNNEL",
+      name: "Standard Tunnel: (Default: 2)",
+      value: config.costs.CONSTRUCTION_COSTS.ELEVATION_MULTIPLIERS.STANDARD_TUNNEL,
+      min: 0.2,
+      max: 10,
+      step: 0.2,
+      float: true
+    })}
+      ${number({
+      key: "costs-CONSTRUCTION_COSTS-ELEVATION_MULTIPLIERS-DEEP_BORE",
+      name: "Deep Bore: (Default: 2)",
+      value: config.costs.CONSTRUCTION_COSTS.ELEVATION_MULTIPLIERS.DEEP_BORE,
+      min: 0.2,
+      max: 10,
+      step: 0.2,
+      float: true
+    })}
+    </div>`;
   };
 
   // views/panel.js
   var panel_default = () => {
-    const style = "top: 65px; right: 16px; width: 322px;";
-    const head = `Subway Conductor v${package_default.version}`;
-    const tabA = { id: "cOptions", name: "Options", body: options_default };
-    const tabB = { id: "cTweaks", name: "Tweaks", body: tweaks_default };
-    const tabC = { id: "cCosts", name: "Costs", body: costs_default };
+    const style = "top: 65px; right: 16px;";
+    const head = `Subway Conductor v${package_default.version} - A Mod By PixelCrisis`;
+    const tabA = { id: "cOptions", name: "Conductor Options", body: options_default };
+    const tabB = { id: "cTweaks", name: "Game Setting Tweaks", body: tweaks_default };
+    const tabC = { id: "cCosts", name: "Adjust Costs & Income", body: costs_default };
     const body = tabs_default(tabA, tabB, tabC);
     return `
     <div id="conductMenu" class="hidden absolute z-20" style="${style}">
@@ -493,7 +614,7 @@
     ${icon("1.3rem")}
   </button>`;
   };
-  var game = () => {
+  var game2 = () => {
     return `<div id="conductGame" onclick="window.Conductor.$showUI()" 
     class="pointer-events-auto bg-background/95 backdrop-blur-sm border border-border/50 rounded-lg text-sm flex items-center justify-center shadow-lg overflow-hidden w-10 h-10 p-2 cursor-pointer hover:bg-secondary">
     ${icon("1.5rem")}
@@ -508,14 +629,14 @@
   var $addUI = () => {
     let root = document.querySelector("#root");
     let main2 = document.querySelector("#conductMain");
-    let game2 = document.querySelector("#conductGame");
+    let game3 = document.querySelector("#conductGame");
     let menu = document.querySelector("#conductMenu");
     if (!menu) root.insertAdjacentHTML("beforeend", panel_default());
-    if (!main2 && !game2) {
+    if (!main2 && !game3) {
       main2 = document.querySelectorAll(mainTop)[0];
-      game2 = document.querySelectorAll(gameTop)[0];
+      game3 = document.querySelectorAll(gameTop)[0];
       if (main2) main2.insertAdjacentHTML("afterbegin", main());
-      if (game2) game2.insertAdjacentHTML("afterbegin", game());
+      if (game3) game3.insertAdjacentHTML("afterbegin", game2());
     }
   };
   var $showUI = () => {
@@ -586,6 +707,7 @@
     if (data) $migrate(config, data);
     console.log(">> Conductor: Tweaking Settings...");
     api.modifyConstants(config.tweaks);
+    api.modifyConstants(config.costs);
     return { ...storage_exports, ...addmenu_exports, ...watcher_exports, config };
   };
 
@@ -708,6 +830,17 @@
     }
   };
 
+  // plugins/setspeed.js
+  var setspeed_default = () => {
+    let mod = window.Conductor;
+    const api = window.SubwayBuilderAPI;
+    let speed = mod.config.game.speed;
+    api.actions.setSpeedMultiplier("slow", speed);
+    api.actions.setSpeedMultiplier("normal", speed);
+    api.actions.setSpeedMultiplier("fast", speed);
+    api.actions.setSpeedMultiplier("ultrafast", speed);
+  };
+
   // index.js
   (function() {
     const api = window.SubwayBuilderAPI;
@@ -715,8 +848,10 @@
     if (mod) mod.version = version;
     else return console.log(">> Conductor Err: No API Access.");
     mod.$addUI();
+    mod.$setSpeed = setspeed_default;
     api.hooks.onGameInit(() => {
       mod.$addUI();
+      mod.$setSpeed();
       mod.$startWatch();
       if (mod.loop) clearInterval(mod.loop);
       mod.loop = setInterval(() => {

@@ -14,6 +14,7 @@ import $trackDemand from './plugins/demand'
 import $trackBlueprints from './plugins/blueprints'
 import $handlePanning from './plugins/panning'
 import $ticketPricing from './plugins/tickets'
+import $setSpeed from './plugins/setspeed'
 
 // let's go
 (function(){
@@ -24,9 +25,11 @@ import $ticketPricing from './plugins/tickets'
   else return console.log('>> Conductor Err: No API Access.')
 
   mod.$addUI() // embed on main page
+  mod.$setSpeed = $setSpeed // add for live changing
 
   api.hooks.onGameInit(() => {
     mod.$addUI() // embed on game page
+    mod.$setSpeed() // set game speeds
     mod.$startWatch() // custom events
     if (mod.loop) clearInterval(mod.loop)
     // define our game loop

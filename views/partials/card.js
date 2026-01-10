@@ -5,7 +5,7 @@
 
 export default data => {
   return `
-    <div class="pointer-events-auto backdrop-blur-sm border border-border/50 h-fit rounded-lg text-sm items-center justify-center shadow-lg overflow-hidden bg-transparent w-full max-h-full flex flex-col">
+    <div class="pointer-events-auto backdrop-blur-md border border-border/50 h-fit rounded-lg text-sm items-center justify-center shadow-lg overflow-hidden bg-transparent w-full max-h-full flex flex-col">
       <div class="flex h-9 min-h-9 w-full p-1 border-b border-primary/15 items-center justify-between bg-primary-foreground">
         <div class="flex items-center h-full w-full"></div>
         <div class="flex items-center h-full w-full">

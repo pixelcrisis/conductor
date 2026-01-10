@@ -51,6 +51,11 @@ export const tickets = {
   high: 3.00
 }
 
+// Game Speed
+export const game = {
+  speed: 1
+}
+
 // Various Pausing
 export const paused = {
   warning: false,
@@ -74,6 +79,18 @@ export const tweaks = {
       CUT_AND_COVER: -10,
       AT_GRADE: -3,
       ELEVATED: 4.5
+    }
+  }
+}
+
+export const costs = {
+  CONSTRUCTION_COSTS: {
+    ELEVATION_MULTIPLIERS: {
+      DEEP_BORE: 4.5,
+      STANDARD_TUNNEL: 2,
+      CUT_AND_COVER: 1,
+      AT_GRADE: 0.3,
+      ELEVATED: 0.8
     }
   }
 }

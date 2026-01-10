@@ -29,17 +29,17 @@ export default (tabA, tabB, tabC) => {
     <div class="border-t"></div>
 
     <div id="${ tabA.id }" class="c-tab flex flex-col gap-4">
-      <div class="flex flex-col gap-2 w-full px-1">
+      <div class="flex gap-3">
         ${ tabA.body() }
       </div>
     </div>
     <div id="${ tabB.id }" class="c-tab flex flex-col gap-4 hidden">
-      <div class="flex flex-col gap-2 w-full px-1">
+      <div class="flex gap-3">
         ${ tabB.body() }
       </div>
     </div>
     <div id="${ tabC.id }" class="c-tab flex flex-col gap-4 hidden">
-      <div class="flex flex-col gap-2 w-full px-1">
+      <div class="flex gap-3">
         ${ tabC.body() }
       </div>
     </div>

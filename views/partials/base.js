@@ -14,26 +14,29 @@ export const toggle = data => {
         ${ data.value ? 'Enabled' : 'Disabled' }
       </span>
       <input type="checkbox" class="sr-only" checked="${ data.value }" />
-    </div>`
+    </div>
+    ${ data.desc ? text(data.desc) : '' }`
 }
 
 export const number = data => {
   const str = data.cash ? '$' : ''
   return `
-  <span class="${ _label } pt-1">${ data.name }</span>
-  <div class="${ _grid }" style="margin-top: -0.75rem">
-    <input type="range" 
-      value="${ data.value }"
-      min="${ data.min }" max="${ data.max }" step="${ data.step }"
-      onchange="window.Conductor.$update('${ data.key }', 
-                  window.Conductor.$getNum(this.value, ${ data.float }))"
-      oninput="this.nextElementSibling.value = '${ str }' + 
-        window.Conductor.$getNum(this.value, ${ data.float }).toLocaleString()"
-      class="rounded-md border border-input px-3 py-2 bg-background text-right text-xs" />
-    <output class="text-xs font-bold text-muted-foreground">
-      ${ str }${ window.Conductor.$getNum(data.value, data.float).toLocaleString() }
-    </output>
-  </div>`
+    ${ label(data.name, "pt-2") }
+    <div class="${ _grid }" style="${ _scoot }">
+      <input type="range" 
+        value="${ data.value }"
+        min="${ data.min }" max="${ data.max }" step="${ data.step }"
+        onchange="window.Conductor.$update('${ data.key }', 
+                    window.Conductor.$getNum(this.value, ${ data.float }));
+                  ${ data.func ? data.func : '' }"
+        oninput="this.nextElementSibling.value = '${ str }' + 
+          window.Conductor.$getNum(this.value, ${ data.float }).toLocaleString()"
+        class="rounded-md border border-input px-3 py-2 bg-background text-right text-xs" />
+      <output class="text-xs font-bold text-muted-foreground">
+        ${ str }${ window.Conductor.$getNum(data.value, data.float).toLocaleString() }
+      </output>
+    </div>
+    ${ data.desc ? text(data.desc, true) : '' }`
 }
 
 export const button = data => {
@@ -44,6 +47,17 @@ export const button = data => {
     </button>`
 }
 
+export const label = (str, cl) => {
+  return `<span class="${ _label } ${ cl ? cl : '' }">${ str }</span>`
+}
+
 // reusable styles
 const _grid = 'flex items-center justify-between gap-2'
 const _label = 'text-xs font-bold text-muted-foreground select-none'
+const _scoot = 'margin-top: -0.75rem'
+
+const text = (str, pad) => `
+  <span class="text-xs text-muted-foreground" style="${ pad ? _scoot : '' }">
+    ${ str }
+  </span>
+`

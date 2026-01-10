@@ -35,7 +35,9 @@ export const $update = (key, val) => {
 
   // define any new game tweaks
   let result = !nested ? val : { [target[2]]: val }
-  if (target[0] == 'tweaks') api.modifyConstants({ [target[1]]: result })
+  if (target[0] == 'tweaks' || target[0] == 'costs') {
+    api.modifyConstants({ [target[1]]: result })
+  }
 
   // save the updated config
   console.log('>> Conductor: Set ' + target.join('.') + ' to ' + val)

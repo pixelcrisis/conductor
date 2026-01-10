@@ -22,6 +22,7 @@ export default (api, config) => {
   // overwrite game settings
   console.log('>> Conductor: Tweaking Settings...')
   api.modifyConstants(config.tweaks)
+  api.modifyConstants(config.costs)
 
   // return our mod
   return { ...$db, ...$ui, ...$ev, config }
